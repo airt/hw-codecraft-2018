@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class Feature {
 
     public static Map<Server, List<List<Integer>>> createTrainData(List<Record> history, Map<Server, Integer> predictFlavors, int predictPeriod, int look_back) {
-        return Feature.createFeature(Feature.createPredictPeriod(Feature.preProcess(history, predictFlavors), predictPeriod), look_back);
+       return Feature.createFeature(Feature.createPredictPeriod(Feature.preProcess(history, predictFlavors), predictPeriod), look_back);
     }
     public static Map<Server, List<Integer>> preProcess(List<Record> history, Map<Server, Integer> predictFlavors) {
         Map<Server, List<Record>> predictFlavorRecord = new HashMap<>();
@@ -112,16 +112,17 @@ public class Feature {
             }
             re.put(server, oneServerSamples);
         }
-//        for (Server server : re.keySet()) {
-//            String[] content = new String[re.get(server).size()];
-//            for (int i = 0; i < re.get(server).size(); i++) {
-//                content[i] = re.get(server).get(i).toString();
-//            }
-//            for (int i = 0; i < content.length; i++) {
-//                content[i] = content[i].substring(1, content[i].length() - 1);
-//            }
-//            FileUtil.write("/Users/cutoutsy/" + server.getName() + ".txt", content, false);
-//        }
+        // 将训练数据写入到文件中，以便分析
+        for (Server server : re.keySet()) {
+            String[] content = new String[re.get(server).size()];
+            for (int i = 0; i < re.get(server).size(); i++) {
+                content[i] = re.get(server).get(i).toString();
+            }
+            for (int i = 0; i < content.length; i++) {
+                content[i] = content[i].substring(1, content[i].length() - 1);
+            }
+//            FileUtil.write("/Users/cutoutsy/workspace/codecraft/data/example/case0/" + server.getName() + ".txt", content, false);
+        }
         return re;
     }
 

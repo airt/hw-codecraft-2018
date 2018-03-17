@@ -22,13 +22,33 @@ public class LinearRegression {
         this.column = dataset.get(0).size();
         trainData = new double[row][column];
 
-        this.alpha = alpha; // 步长默认为0.001
-        this.iteration = iteration;     // 迭代次数为1w
+        this.alpha = alpha;
+        this.iteration = iteration;
         theta = new double[column - 1];
 
         initializeTheta();
 
         loadTrainData(dataset);
+    }
+
+    /**
+     * 根据二维数组初始化
+     * @param dataset
+     * @param alpha
+     * @param iteration
+     */
+    public LinearRegression(double[][] dataset, double alpha, int iteration) {
+        this.row = dataset.length;
+        this.column = dataset[0].length;
+        trainData = dataset;
+
+        this.alpha = alpha;
+        this.iteration = iteration;
+        theta = new double[column - 1];
+
+        initializeTheta();
+
+//        loadTrainData(dataset);
     }
 
     private void loadTrainData(List<List<Integer>> dataset) {
@@ -44,12 +64,35 @@ public class LinearRegression {
 
     public void trainTheta() {
         int iteration = this.iteration;
-        while ((iteration--) > 0) {
+//        while ((iteration--) > 0) {
+//            double[] partial_derivative = computePartialDerivative();   // 偏导数
+//            for (int i = 0; i < theta.length; i++) {
+//                theta[i] -= alpha * partial_derivative[i];
+//            }
+//        }
+        for (int i = 0; i < iteration; i++) {
+                // 输出代价
+//            if (i % 100 == 0) {
+//                System.out.println("Cost: " + computeCost(theta));
+//            }
             double[] partial_derivative = computePartialDerivative();   // 偏导数
-            for (int i = 0; i < theta.length; i++) {
-                theta[i] -= alpha * partial_derivative[i];
+            for (int j = 0; j < theta.length; j++) {
+                theta[j] -= alpha * partial_derivative[j];
             }
         }
+    }
+
+    private double computeCost(double[] theta) {
+        double result = 0.0;
+        for (int i = 0; i < trainData.length; i++) {
+            double[] oneRow = trainData[i];
+            double sum = 0;
+            for (int k = 0; k < (oneRow.length -1); k++) {
+                sum += theta[k] * oneRow[k];
+            }
+            result += Math.pow(sum - oneRow[oneRow.length - 1], 2);
+        }
+        return result;
     }
 
     private double[] computePartialDerivative() {
@@ -60,28 +103,28 @@ public class LinearRegression {
         return partial_derivative;
     }
 
-    private double computePartialDerivativeForTheta(int i) {
+    private double computePartialDerivativeForTheta(int thetaI) {
         double sum = 0.0;
         for (int j = 0; j < row; j++) {
-            sum += h_theta_x_i_minus_y_i_times_x_j_i(j, i);
+            sum += h_theta_x_i_minus_y_i_times_x_j_i(j, thetaI);
         }
         return sum / row;
     }
 
-    private double h_theta_x_i_minus_y_i_times_x_j_i(int j, int i) {
-        double[] oneRow = trainData[j];
+    private double h_theta_x_i_minus_y_i_times_x_j_i(int r, int thetaI) {
+        double[] oneRow = trainData[r];
         double result = 0.0;
         for (int k = 0; k < (oneRow.length -1); k++) {
             result += theta[k] * oneRow[k];
         }
         result -= oneRow[oneRow.length - 1];
-        result *= oneRow[i];
+        result *= oneRow[thetaI];
         return result;
     }
 
     private void initializeTheta() {
         for (int i = 0; i < theta.length; i++) {
-            theta[i] = 1.0;     // 将theta各个参数初始化为1.0
+            theta[i] = 0.0;     // 将theta各个参数初始化为1.0
         }
     }
 
@@ -99,15 +142,23 @@ public class LinearRegression {
         List<List<Integer>> dataset = new ArrayList<>();
         List<Integer> list1 = new ArrayList<>();
         List<Integer> list2 = new ArrayList<>();
-        list1.add(1);
-        list1.add(1);
-        list1.add(5);
-        list2.add(1);
-        list2.add(2);
-        list2.add(8);
+        List<Integer> list3 = new ArrayList<>();
+        list1.add(17);
+        list1.add(25);
+        list1.add(43);
+        list1.add(26);
+        list2.add(25);
+        list2.add(43);
+        list2.add(26);
+        list2.add(31);
+        list3.add(43);
+        list3.add(26);
+        list3.add(31);
+        list3.add(31);
         dataset.add(list1);
         dataset.add(list2);
-        LinearRegression lr = new LinearRegression(dataset, 0.01, 10000);
+        dataset.add(list3);
+        LinearRegression lr = new LinearRegression(dataset, 0.00001, 50);
         lr.trainTheta();
         lr.printTheta();
     }

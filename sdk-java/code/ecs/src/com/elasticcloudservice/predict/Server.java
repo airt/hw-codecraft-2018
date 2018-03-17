@@ -37,4 +37,24 @@ public class Server {
     public void setMem(int mem) {
         this.mem = mem;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Server server = (Server) o;
+
+        if (cpu != server.cpu) return false;
+        if (mem != server.mem) return false;
+        return name != null ? name.equals(server.name) : server.name == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + cpu;
+        result = 31 * result + mem;
+        return result;
+    }
 }

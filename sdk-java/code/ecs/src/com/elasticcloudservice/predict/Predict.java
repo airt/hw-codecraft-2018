@@ -10,6 +10,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Predict {
+    /**
+     * 预测虚拟机的实际数量，用于计算评分
+     */
+    static Map<Server, Integer> flavorsNum = new HashMap<Server, Integer>();
+    /**
+     * 虚拟机的预测数量
+     */
+    static Map<Server, Integer> predictFlavors = new HashMap<Server, Integer>();
+
     public static String[] predictVm(String[] ecsContent, String[] inputContent) {
         String[] results = new String[ecsContent.length];
         List<Record> history = new ArrayList<Record>();
@@ -26,10 +35,6 @@ public class Predict {
 
         int flavorNum = Integer.valueOf(inputContent[2]);
 
-        Map<Server, Integer> predictFlavors = new HashMap<Server, Integer>();
-        // 预测虚拟机的实际数量，用作计算评分
-        Map<Server, Integer> flavorsNum = new HashMap<Server, Integer>();
-
         for (int i = 3; i < 3 + flavorNum; i++) {
             String[] array = inputContent[i].split(" ");
             Server flavor = new Server(array[0], Integer.valueOf(array[1]), Integer.valueOf(array[2]) / 1024);
@@ -37,51 +42,18 @@ public class Predict {
             flavorsNum.put(flavor, 0);
         }
 
-//        for (String line : testContent) {
-//            for (Server server : flavorsNum.keySet()) {
-//                if (line.split("\\t")[1].equals(server.getName())) {
-//                    flavorsNum.put(server, flavorsNum.get(server) + 1);
-//                }
-//            }
-//        }
-
-        String[] actualFlavorNum = new String[flavorsNum.size()];
-        int actualIndex = 0;
-        for (Server flavor : flavorsNum.keySet()) {
-            actualFlavorNum[actualIndex++] = flavor.getName() + " " + flavorsNum.get(flavor);
-        }
-//        FileUtil.write("/Users/cutoutsy/workspace/codecraft/data/example/case1/actual.txt", actualFlavorNum, false);
-
         // 优化资源名称，0：CPU, 1: MEM
         int optimization = inputContent[4 + flavorNum].equals("CPU") ? 0 : 1;
 
         // 预测开始时间和结束时间
         String start = inputContent[6 + flavorNum];
         String end = inputContent[7 + flavorNum];
-
-        int period = (int)ChronoUnit.DAYS.between(LocalDate.parse(start.split(" ")[0]), LocalDate.parse(end.split(" ")[0]));
-        System.out.println("period: " + period);
-        // 生成预测训练数据
-        Map<Server, List<List<Integer>>> trainData = Feature.createTrainData(history, predictFlavors, period, 5);
-        for (Server server : trainData.keySet()) {
-            List<List<Integer>> oneFlavorTrainData = trainData.get(server);
-//            if (oneFlavorTrainData.size() < 10) {
-//                predict(history, predictFlavors, start, end);
-//                break;
-//            }
-            LinearRegression lr = new LinearRegression(oneFlavorTrainData, 0.001, 100000);
-            lr.trainTheta();
-            double[] theta = lr.getTheta();
-            List<Integer> last = oneFlavorTrainData.get(oneFlavorTrainData.size() - 1);
-            double num = 0;
-            for (int i = 1; i < last.size(); i++) {
-                num += theta[i-1] * last.get(i);
-            }
-            num = num <= 0 ? 0 : num;
-            predictFlavors.put(server, (int)Math.round(num));
-        }
-
-//        LogUtil.printLog("predict score: " + Metrics.predictScore(flavorsNum, predictFlavors));
+        // 线性规划预测
+        predictByLR(history, start, end, 6);
+        // 统计预测
+//        predict(history, start, end);
+        
+//        predictMultipleLinearRe(history, start, end, 2);
 
         // 预测结果若虚拟机总数为0
 //        if (predictFlavors.values().stream().reduce(0, (acc, element) -> acc + element) == 0) {
@@ -158,35 +130,102 @@ public class Predict {
     }
 
     /**
-     * 虚拟机数量预测
+     * 虚拟机数量预测（统计方法，score:61.257）
      * @param history
-     * @param flavors
      * @param start
      * @param end
      */
-    private static void predict(List<Record> history, Map<Server, Integer> flavors, String start, String end) {
-        // 根据历史数据设置各个虚拟机规格的比率
-        double[] flavorRatio = {0.076, 0.1, 0.017, 0.03, 0.126, 0.039, 0.0267, 0.219, 0.069, 0.014, 0.068, 0.059, 0.015, 0.0528, 0.025};
+    private static void predict(List<Record> history, String start, String end) {
         // 历史申请总数
         int total = history.size();
         LogUtil.printLog("history total:" + total);
-//        HashMap<String, Integer> flavor = new HashMap<String, Integer>();
+        HashMap<String, Integer> flavor = new HashMap<String, Integer>();
         // 各种规格虚拟机的数量
-//        for (Record record : history) {
-//            flavor.put(record.getFlavorName(), flavor.getOrDefault(record.getFlavorName(), 0) + 1);
-//        }
-//        LogUtil.printLog("flavor2 num: " + flavor.get("flavor2"));
+        for (Record record : history) {
+            flavor.put(record.getFlavorName(), flavor.getOrDefault(record.getFlavorName(), 0) + 1);
+        }
+        LogUtil.printLog("flavor2 num: " + flavor.get("flavor2"));
         long period = ChronoUnit.DAYS.between(LocalDate.parse(start.split(" ")[0]), LocalDate.parse(end.split(" ")[0]));
-//        LocalDate.parse(start);
 
-//        long totalTime = Timestamp.valueOf(history.get(history.size()-1).getCreateTime()).getTime() - Timestamp.valueOf(history.get(0).getCreateTime()).getTime();
         long totalTime = ChronoUnit.DAYS.between(LocalDate.parse(history.get(0).getCreateTime().split(" ")[0]), LocalDate.parse(history.get(history.size()-1).getCreateTime().split(" ")[0]));
         int periodNum = (int) (total / totalTime * period);
         LogUtil.printLog("period total:" + periodNum);
-        for (Server server : flavors.keySet()) {
+        for (Server server : predictFlavors.keySet()) {
             String flavorName = server.getName();
-            flavors.put(server, (int) (periodNum * flavorRatio[Integer.valueOf(flavorName.substring(6))-1]));
+            double flavorNum = flavor.get(flavorName);
+            predictFlavors.put(server, (int)Math.round(flavorNum * (double) periodNum / (double) total ));
         }
+    }
+
+    private static void predictByLR(List<Record> history, String start, String end, int look_back) {
+        int period = (int)ChronoUnit.DAYS.between(LocalDate.parse(start.split(" ")[0]), LocalDate.parse(end.split(" ")[0]));
+        System.out.println("period: " + period);
+        Map<Server, List<List<Integer>>> trainData = Feature.createTrainData(history, predictFlavors, period, look_back);
+        for (Server server : trainData.keySet()) {
+            List<List<Integer>> oneFlavorTrainData = trainData.get(server);
+            // alpha要尽可能下，不然不能拟合
+            LinearRegression lr = new LinearRegression(oneFlavorTrainData, 0.0001, 100000);
+            lr.trainTheta();
+            double[] theta = lr.getTheta();
+            System.out.println(server.name + ":" + Arrays.toString(theta));
+            List<Integer> last = oneFlavorTrainData.get(oneFlavorTrainData.size() - 1);
+            double num = 0;
+            for (int i = 1; i < last.size(); i++) {
+                num += theta[i-1] * last.get(i);
+            }
+            num = num <= 0 ? 0 : num;
+            predictFlavors.put(server, (int)Math.round(num));
+        }
+    }
+
+//    public static void predictMultipleLinearRe(List<Record> history, String start, String end, int look_back) {
+//        OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
+//        int period = (int)ChronoUnit.DAYS.between(LocalDate.parse(start.split(" ")[0]), LocalDate.parse(end.split(" ")[0]));
+//        System.out.println("period: " + period);
+//        Map<Server, List<List<Integer>>> trainData = Feature.createTrainData(history, predictFlavors, period, look_back);
+//        for (Server server : trainData.keySet()) {
+//            List<List<Integer>> oneFlavorTrainData = trainData.get(server);
+//            double[] y = new double[oneFlavorTrainData.size()];
+//            double[][] x = new double[oneFlavorTrainData.size()][oneFlavorTrainData.get(0).size() - 1];
+//            for (int i = 0; i < oneFlavorTrainData.size(); i++) {
+//                List<Integer> tmp = oneFlavorTrainData.get(i);
+//                y[i] = tmp.get(tmp.size() - 1);
+//                for (int j = 0; j < tmp.size() - 1; j++) {
+//                    x[i][j] = tmp.get(j);
+//                }
+//            }
+//            regression.newSampleData(y, x);
+//            double[] theta = regression.estimateRegressionParameters();
+//            List<Integer> last = oneFlavorTrainData.get(oneFlavorTrainData.size() - 1);
+//            double num = 0;
+//            for (int i = 1; i < last.size(); i++) {
+//                num += theta[i-1] * last.get(i);
+//            }
+//            num = num <= 0 ? 0 : num;
+//            predictFlavors.put(server, (int)Math.round(num));
+//        }
+//    }
+
+    /**
+     * 计算预测评分，线上提交代码不会执行
+     * @param testContent
+     * @return
+     */
+    public static double metrics(String[] testContent) {
+        for (String line : testContent) {
+            for (Server server : flavorsNum.keySet()) {
+                if (line.split("\\t")[1].equals(server.getName())) {
+                    flavorsNum.put(server, flavorsNum.get(server) + 1);
+                }
+            }
+        }
+        int index = 0;
+        String[] actualNum = new String[flavorsNum.size()];
+        for (Server flavor : flavorsNum.keySet()) {
+            actualNum[index++] = flavor.getName() + " " + flavorsNum.get(flavor);
+        }
+//        FileUtil.write("/Users/cutoutsy/workspace/codecraft/data/example/case3/actual.txt", actualNum, false);
+        return Metrics.predictScore(flavorsNum, predictFlavors);
     }
 
     public static void main(String[] args) {

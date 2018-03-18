@@ -52,7 +52,7 @@ public class Predict {
         predictByLR(history, start, end, 6);
         // 统计预测
 //        predict(history, start, end);
-        
+
 //        predictMultipleLinearRe(history, start, end, 2);
 
         // 预测结果若虚拟机总数为0

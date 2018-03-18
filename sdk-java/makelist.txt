@@ -6,3 +6,11 @@ com/elasticcloudservice/predict/Server.java
 com/elasticcloudservice/predict/Record.java
 com/elasticcloudservice/predict/Feature.java
 com/model/LinearRegression.java
+io/ecs/common/Matrix.java
+io/ecs/common/TODO.java
+io/ecs/common/Tuple2.java
+io/ecs/deploy/Deploy.java
+io/ecs/generator/DataGenerator.java
+io/ecs/model/LR.java
+io/ecs/model/Model.java
+io/ecs/model/NN.java

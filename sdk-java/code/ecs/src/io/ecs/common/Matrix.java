@@ -46,12 +46,31 @@ class NaiveMatrix implements Matrix {
 
   @Override
   public Matrix t() {
-    return TODO.throwing();
+    double[][] np = new double[cols()][rows()];
+    for (int i = 0; i < cols(); i++) {
+      for (int j = 0; j < rows(); j++) {
+        np[i][j] = payload[j][i];
+      }
+    }
+    return new NaiveMatrix(np);
   }
 
   @Override
   public Matrix mul(Matrix rhs) {
-    return TODO.throwing();
+    if (cols() != rhs.rows()) {
+      throw new IllegalArgumentException();
+    }
+    double[][] np = new double[rows()][rhs.cols()];
+    for (int i = 0; i < rows(); i++) {
+      for (int j = 0; j < rhs.cols(); j++) {
+        int s = 0;
+        for (int k = 0; k < cols(); k++) {
+          s += get(i, k) * rhs.get(k, j);
+        }
+        np[i][j] = s;
+      }
+    }
+    return new NaiveMatrix(np);
   }
 
   @Override

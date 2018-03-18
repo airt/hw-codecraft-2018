@@ -1,5 +1,7 @@
 package io.ecs.common;
 
+import java.util.Objects;
+
 @SuppressWarnings("WeakerAccess")
 public class Tuple2<T1, T2> {
 
@@ -21,6 +23,24 @@ public class Tuple2<T1, T2> {
 
   public T2 _2() {
     return _2;
+  }
+
+  @Override
+  public boolean equals(Object rhs) {
+    if (this == rhs) return true;
+    if (!(rhs instanceof Tuple2)) return false;
+    Tuple2<?, ?> t = (Tuple2<?, ?>) rhs;
+    return Objects.equals(_1, t._1) && Objects.equals(_2, t._2);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_1, _2);
+  }
+
+  @Override
+  public String toString() {
+    return "(" + _1 + ", " + _2 + ")";
   }
 
 }

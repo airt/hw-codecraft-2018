@@ -1,5 +1,7 @@
 package io.ecs.common;
 
+import java.util.Arrays;
+
 public interface Matrix {
 
   static Matrix of(double[][] raw) {
@@ -8,6 +10,8 @@ public interface Matrix {
 
   /**
    * m[i, j]
+   * <p>
+   * m[-1, -1] == m[rows - 1, cols - 1]
    */
   double get(int row, int col);
 
@@ -21,10 +25,29 @@ public interface Matrix {
    */
   Matrix mul(Matrix rhs);
 
+  /**
+   * m[i, :]
+   */
+  Matrix row(int row);
+
+  /**
+   * m[:, j]
+   */
+  Matrix col(int col);
+
+  /**
+   * how many rows?
+   */
   int rows();
 
+  /**
+   * how many columns?
+   */
   int cols();
 
+  /**
+   * (rows, cols)
+   */
   default Tuple2<Integer, Integer> shape() {
     return Tuple2.of(rows(), cols());
   }
@@ -41,6 +64,12 @@ class NaiveMatrix implements Matrix {
 
   @Override
   public double get(int row, int col) {
+    if (row < 0) {
+      row += rows();
+    }
+    if (col < 0) {
+      col += cols();
+    }
     return payload[row][col];
   }
 
@@ -69,6 +98,28 @@ class NaiveMatrix implements Matrix {
         }
         np[i][j] = s;
       }
+    }
+    return new NaiveMatrix(np);
+  }
+
+  @Override
+  public Matrix row(int row) {
+    if (row < 0) {
+      row += rows();
+    }
+    double[][] np = new double[1][];
+    np[0] = Arrays.copyOf(payload[row], cols());
+    return new NaiveMatrix(np);
+  }
+
+  @Override
+  public Matrix col(int col) {
+    if (col < 0) {
+      col += cols();
+    }
+    double[][] np = new double[rows()][1];
+    for (int i = 0; i < rows(); i++) {
+      np[i][0] = payload[i][col];
     }
     return new NaiveMatrix(np);
   }

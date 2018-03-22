@@ -21,16 +21,44 @@ public interface Matrix {
   Matrix t();
 
   /**
+   * m<sub>1</sub> - m<sub>2</sub>
+   */
+  default Matrix sub(Matrix m) {
+    if (rows() != m.rows()) throw new IllegalArgumentException();
+    double[][] np = new double[rows()][cols()];
+    for (int i = 0; i < rows(); i++) {
+      for (int j = 0; j < cols(); j++) {
+        np[i][j] = get(i, j) - m.get(m.cols() == 1 ? 0 : i, j);
+      }
+    }
+    return new NaiveMatrix(np);
+  }
+
+  /**
    * m<sub>1</sub> · m<sub>2</sub>
    */
-  default Matrix mul(Matrix rhs) {
-    if (cols() != rhs.rows()) throw new IllegalArgumentException();
-    double[][] np = new double[rows()][rhs.cols()];
+  default Matrix mul(Matrix m) {
+    if (cols() != m.rows()) throw new IllegalArgumentException();
+    double[][] np = new double[rows()][m.cols()];
     for (int i = 0; i < rows(); i++) {
-      for (int j = 0; j < rhs.cols(); j++) {
+      for (int j = 0; j < m.cols(); j++) {
         int s = 0;
-        for (int k = 0; k < cols(); k++) s += get(i, k) * rhs.get(k, j);
+        for (int k = 0; k < cols(); k++) s += get(i, k) * m.get(k, j);
         np[i][j] = s;
+      }
+    }
+    return new NaiveMatrix(np);
+  }
+
+  /**
+   * m<sub>1</sub> ./ m<sub>2</sub>
+   */
+  default Matrix dotDiv(Matrix m) {
+    if (rows() != m.rows()) throw new IllegalArgumentException();
+    double[][] np = new double[rows()][cols()];
+    for (int i = 0; i < rows(); i++) {
+      for (int j = 0; j < cols(); j++) {
+        np[i][j] = get(i, j) / m.get(m.cols() == 1 ? 0 : i, j);
       }
     }
     return new NaiveMatrix(np);

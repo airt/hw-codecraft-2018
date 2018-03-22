@@ -39,6 +39,16 @@ public interface Matrix {
   }
 
   /**
+   * @return matrix m<sub>r</sub> :: (1 × cols)
+   */
+  Matrix meanOfRows();
+
+  /**
+   * @return matrix m<sub>r</sub> :: (2 × cols)
+   */
+  Matrix maxMinOfRows();
+
+  /**
    * m[i, :]
    */
   Matrix row(int row);
@@ -85,18 +95,37 @@ class NaiveMatrix implements Matrix {
   @Override
   public Matrix t() {
     double[][] np = new double[cols()][rows()];
-    for (int i = 0; i < cols(); i++) {
-      for (int j = 0; j < rows(); j++) {
-        np[i][j] = payload[j][i];
+    for (int j = 0; j < cols(); j++) {
+      for (int i = 0; i < rows(); i++) {
+        np[j][i] = get(i, j);
       }
     }
     return new NaiveMatrix(np);
   }
 
   @Override
+  public Matrix meanOfRows() {
+    double[] means = new double[cols()];
+    for (int j = 0; j < cols(); j++) {
+      double sum = 0;
+      for (int i = 0; i < rows(); i++) {
+        sum += get(i, j);
+      }
+      double mean = sum / rows();
+      means[j] = mean;
+    }
+    return new RowVector(means);
+  }
+
+  @Override
+  public Matrix maxMinOfRows() {
+    return TODO.throwing();
+  }
+
+  @Override
   public Matrix row(int row) {
     if (row < 0) row += rows();
-    return new NaiveMatrix(new double[][]{Arrays.copyOf(payload[row], cols())});
+    return new RowVector(Arrays.copyOf(payload[row], cols()));
   }
 
   @Override
@@ -139,13 +168,34 @@ class ColVector implements Matrix {
 
   @Override
   public Matrix t() {
-    return new NaiveMatrix(new double[][]{payload});
+    return new RowVector(Arrays.copyOf(payload, payload.length));
+  }
+
+  @Override
+  public Matrix meanOfRows() {
+    double sum = 0;
+    for (double v : payload) {
+      sum += v;
+    }
+    double mean = sum / rows();
+    return new RowVector(new double[]{mean});
+  }
+
+  @Override
+  public Matrix maxMinOfRows() {
+    double max = Double.MIN_VALUE;
+    double min = Double.MAX_VALUE;
+    for (double v : payload) {
+      if (max < v) max = v;
+      if (v < min) min = v;
+    }
+    return new NaiveMatrix(new double[][]{{max}, {min}});
   }
 
   @Override
   public Matrix row(int row) {
     if (row < 0) row += rows();
-    return new NaiveMatrix(new double[][]{{payload[row]}});
+    return new RowVector(new double[]{payload[row]});
   }
 
   @Override
@@ -163,6 +213,62 @@ class ColVector implements Matrix {
   @Override
   public int cols() {
     return 1;
+  }
+
+}
+
+class RowVector implements Matrix {
+
+  private final double[] payload;
+
+  RowVector(double[] payload) {
+    this.payload = payload;
+  }
+
+  @Override
+  public double get(int row, int col) {
+    if (row < 0) row += rows();
+    if (col < 0) col += cols();
+    if (row != 0) throw new IndexOutOfBoundsException();
+    return payload[col];
+  }
+
+  @Override
+  public Matrix t() {
+    return new ColVector(Arrays.copyOf(payload, payload.length));
+  }
+
+  @Override
+  public Matrix meanOfRows() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Matrix maxMinOfRows() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Matrix row(int row) {
+    if (row < 0) row += rows();
+    if (row != 0) throw new IndexOutOfBoundsException();
+    return new RowVector(Arrays.copyOf(payload, payload.length));
+  }
+
+  @Override
+  public Matrix col(int col) {
+    if (col < 0) col += cols();
+    return new ColVector(new double[]{payload[col]});
+  }
+
+  @Override
+  public int rows() {
+    return 1;
+  }
+
+  @Override
+  public int cols() {
+    return payload.length;
   }
 
 }

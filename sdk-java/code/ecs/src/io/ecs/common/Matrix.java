@@ -29,9 +29,7 @@ public interface Matrix {
     for (int i = 0; i < rows(); i++) {
       for (int j = 0; j < rhs.cols(); j++) {
         int s = 0;
-        for (int k = 0; k < cols(); k++) {
-          s += get(i, k) * rhs.get(k, j);
-        }
+        for (int k = 0; k < cols(); k++) s += get(i, k) * rhs.get(k, j);
         np[i][j] = s;
       }
     }
@@ -42,6 +40,11 @@ public interface Matrix {
    * @return matrix m<sub>r</sub> :: (1 × cols)
    */
   Matrix meanOfRows();
+
+  /**
+   * @return matrix m<sub>r</sub> :: (2 × cols)
+   */
+  Matrix meanAndStdOfRows();
 
   /**
    * @return matrix m<sub>r</sub> :: (2 × cols)
@@ -108,13 +111,30 @@ class NaiveMatrix implements Matrix {
     double[] means = new double[cols()];
     for (int j = 0; j < cols(); j++) {
       double sum = 0;
-      for (int i = 0; i < rows(); i++) {
-        sum += get(i, j);
-      }
+      for (int i = 0; i < rows(); i++) sum += get(i, j);
       double mean = sum / rows();
       means[j] = mean;
     }
     return new RowVector(means);
+  }
+
+  @Override
+  public Matrix meanAndStdOfRows() {
+    double[][] mass = new double[2][cols()];
+    for (int j = 0; j < cols(); j++) {
+      double sum = 0;
+      for (int i = 0; i < rows(); i++) sum += get(i, j);
+      double mean = sum / rows();
+      mass[0][j] = mean;
+    }
+    for (int j = 0; j < cols(); j++) {
+      double mean = mass[0][j];
+      double sqrsum = 0;
+      for (int i = 0; i < rows(); i++) sqrsum += Math.pow(get(i, j) - mean, 2);
+      double std = Math.sqrt(sqrsum / (rows() - 1));
+      mass[1][j] = std;
+    }
+    return new NaiveMatrix(mass);
   }
 
   @Override
@@ -132,9 +152,7 @@ class NaiveMatrix implements Matrix {
   public Matrix col(int col) {
     if (col < 0) col += cols();
     double[] np = new double[rows()];
-    for (int i = 0; i < rows(); i++) {
-      np[i] = payload[i][col];
-    }
+    for (int i = 0; i < rows(); i++) np[i] = payload[i][col];
     return new ColVector(np);
   }
 
@@ -174,11 +192,20 @@ class ColVector implements Matrix {
   @Override
   public Matrix meanOfRows() {
     double sum = 0;
-    for (double v : payload) {
-      sum += v;
-    }
+    for (double v : payload) sum += v;
     double mean = sum / rows();
     return new RowVector(new double[]{mean});
+  }
+
+  @Override
+  public Matrix meanAndStdOfRows() {
+    double sum = 0;
+    for (double v : payload) sum += v;
+    double mean = sum / rows();
+    double sqrsum = 0;
+    for (double v : payload) sqrsum += Math.pow(v - mean, 2);
+    double std = Math.sqrt(sqrsum / (rows() - 1));
+    return new RowVector(new double[]{mean, std});
   }
 
   @Override
@@ -240,6 +267,11 @@ class RowVector implements Matrix {
 
   @Override
   public Matrix meanOfRows() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Matrix meanAndStdOfRows() {
     throw new UnsupportedOperationException();
   }
 

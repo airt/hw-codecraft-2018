@@ -45,6 +45,27 @@ class MatrixTest {
   }
 
   @Test
+  void meanOfRows() {
+    Matrix mor = m.meanOfRows();
+    assertEquals(Tuple2.of(1, 3), mor.shape());
+    assertEquals(2.5, mor.get(0, 0));
+    assertEquals(3.5, mor.get(0, 1));
+    assertEquals(4.5, mor.get(0, 2));
+  }
+
+  @Test
+  void meanAndStdOfRows() {
+    Matrix masor = m.meanAndStdOfRows();
+    assertEquals(Tuple2.of(2, 3), masor.shape());
+    assertEquals(2.5, masor.get(0, 0));
+    assertEquals(3.5, masor.get(0, 1));
+    assertEquals(4.5, masor.get(0, 2));
+    assertEquals(2.1213, masor.get(1, 0), 0.001);
+    assertEquals(2.1213, masor.get(1, 1), 0.001);
+    assertEquals(2.1213, masor.get(1, 2), 0.001);
+  }
+
+  @Test
   void row() {
     Matrix mr = m.row(-1);
     assertEquals(Tuple2.of(1, 3), mr.shape());

@@ -24,11 +24,11 @@ public interface Matrix {
    * m<sub>1</sub> - m<sub>2</sub>
    */
   default Matrix sub(Matrix m) {
-    if (rows() != m.rows()) throw new IllegalArgumentException();
+    if (cols() != m.cols()) throw new IllegalArgumentException();
     double[][] np = new double[rows()][cols()];
     for (int i = 0; i < rows(); i++) {
       for (int j = 0; j < cols(); j++) {
-        np[i][j] = get(i, j) - m.get(m.cols() == 1 ? 0 : i, j);
+        np[i][j] = get(i, j) - m.get(m.rows() == 1 ? 0 : i, j);
       }
     }
     return new NaiveMatrix(np);
@@ -54,11 +54,11 @@ public interface Matrix {
    * m<sub>1</sub> ./ m<sub>2</sub>
    */
   default Matrix dotDiv(Matrix m) {
-    if (rows() != m.rows()) throw new IllegalArgumentException();
+    if (cols() != m.cols()) throw new IllegalArgumentException();
     double[][] np = new double[rows()][cols()];
     for (int i = 0; i < rows(); i++) {
       for (int j = 0; j < cols(); j++) {
-        np[i][j] = get(i, j) / m.get(m.cols() == 1 ? 0 : i, j);
+        np[i][j] = get(i, j) / m.get(m.rows() == 1 ? 0 : i, j);
       }
     }
     return new NaiveMatrix(np);
@@ -104,6 +104,17 @@ public interface Matrix {
    */
   default Tuple2<Integer, Integer> shape() {
     return Tuple2.of(rows(), cols());
+  }
+
+  default String show() {
+    StringBuilder lines = new StringBuilder();
+    for (int i = 0; i < rows(); i++) {
+      for (int j = 0; j < cols(); j++) {
+        lines.append(String.format("% 10.4f", get(i, j)));
+      }
+      lines.append('\n');
+    }
+    return lines.toString();
   }
 
 }

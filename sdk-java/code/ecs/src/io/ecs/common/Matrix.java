@@ -21,9 +21,22 @@ public interface Matrix {
   Matrix t();
 
   /**
-   * m1 * m2
+   * m<sub>1</sub> · m<sub>2</sub>
    */
-  Matrix mul(Matrix rhs);
+  default Matrix mul(Matrix rhs) {
+    if (cols() != rhs.rows()) throw new IllegalArgumentException();
+    double[][] np = new double[rows()][rhs.cols()];
+    for (int i = 0; i < rows(); i++) {
+      for (int j = 0; j < rhs.cols(); j++) {
+        int s = 0;
+        for (int k = 0; k < cols(); k++) {
+          s += get(i, k) * rhs.get(k, j);
+        }
+        np[i][j] = s;
+      }
+    }
+    return new NaiveMatrix(np);
+  }
 
   /**
    * m[i, :]
@@ -64,12 +77,8 @@ class NaiveMatrix implements Matrix {
 
   @Override
   public double get(int row, int col) {
-    if (row < 0) {
-      row += rows();
-    }
-    if (col < 0) {
-      col += cols();
-    }
+    if (row < 0) row += rows();
+    if (col < 0) col += cols();
     return payload[row][col];
   }
 
@@ -85,43 +94,19 @@ class NaiveMatrix implements Matrix {
   }
 
   @Override
-  public Matrix mul(Matrix rhs) {
-    if (cols() != rhs.rows()) {
-      throw new IllegalArgumentException();
-    }
-    double[][] np = new double[rows()][rhs.cols()];
-    for (int i = 0; i < rows(); i++) {
-      for (int j = 0; j < rhs.cols(); j++) {
-        int s = 0;
-        for (int k = 0; k < cols(); k++) {
-          s += get(i, k) * rhs.get(k, j);
-        }
-        np[i][j] = s;
-      }
-    }
-    return new NaiveMatrix(np);
-  }
-
-  @Override
   public Matrix row(int row) {
-    if (row < 0) {
-      row += rows();
-    }
-    double[][] np = new double[1][];
-    np[0] = Arrays.copyOf(payload[row], cols());
-    return new NaiveMatrix(np);
+    if (row < 0) row += rows();
+    return new NaiveMatrix(new double[][]{Arrays.copyOf(payload[row], cols())});
   }
 
   @Override
   public Matrix col(int col) {
-    if (col < 0) {
-      col += cols();
-    }
-    double[][] np = new double[rows()][1];
+    if (col < 0) col += cols();
+    double[] np = new double[rows()];
     for (int i = 0; i < rows(); i++) {
-      np[i][0] = payload[i][col];
+      np[i] = payload[i][col];
     }
-    return new NaiveMatrix(np);
+    return new ColVector(np);
   }
 
   @Override
@@ -132,6 +117,52 @@ class NaiveMatrix implements Matrix {
   @Override
   public int cols() {
     return payload.length == 0 ? 0 : payload[0].length;
+  }
+
+}
+
+class ColVector implements Matrix {
+
+  private final double[] payload;
+
+  ColVector(double[] payload) {
+    this.payload = payload;
+  }
+
+  @Override
+  public double get(int row, int col) {
+    if (row < 0) row += rows();
+    if (col < 0) col += cols();
+    if (col != 0) throw new IndexOutOfBoundsException();
+    return payload[row];
+  }
+
+  @Override
+  public Matrix t() {
+    return new NaiveMatrix(new double[][]{payload});
+  }
+
+  @Override
+  public Matrix row(int row) {
+    if (row < 0) row += rows();
+    return new NaiveMatrix(new double[][]{{payload[row]}});
+  }
+
+  @Override
+  public Matrix col(int col) {
+    if (col < 0) col += cols();
+    if (col != 0) throw new IndexOutOfBoundsException();
+    return new ColVector(Arrays.copyOf(payload, payload.length));
+  }
+
+  @Override
+  public int rows() {
+    return payload.length;
+  }
+
+  @Override
+  public int cols() {
+    return 1;
   }
 
 }

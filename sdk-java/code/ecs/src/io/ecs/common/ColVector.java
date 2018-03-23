@@ -6,7 +6,7 @@ public class ColVector implements Matrix {
 
   private final double[] payload;
 
-  ColVector(double[] payload) {
+  public ColVector(double[] payload) {
     this.payload = payload;
   }
 

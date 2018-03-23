@@ -6,7 +6,7 @@ public class RowVector implements Matrix {
 
   private final double[] payload;
 
-  RowVector(double[] payload) {
+  public RowVector(double[] payload) {
     this.payload = payload;
   }
 

@@ -4,6 +4,10 @@ import java.util.Arrays;
 
 public class ColVector implements Matrix {
 
+  public static Matrix of(double... raw) {
+    return new ColVector(raw);
+  }
+
   private final double[] payload;
 
   public ColVector(double[] payload) {

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class ColVector implements Matrix {
 
-  public static Matrix of(double... raw) {
+  public static ColVector of(double... raw) {
     return new ColVector(raw);
   }
 

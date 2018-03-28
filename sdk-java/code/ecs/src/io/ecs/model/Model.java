@@ -4,8 +4,20 @@ import io.ecs.common.Matrix;
 
 public interface Model {
 
-  void fit(Matrix features, Matrix labels);
+  /**
+   * m: number of training examples
+   * <p>
+   * n: number of features
+   *
+   * @param xs :: (m × n)
+   * @param ys :: (m × 1)
+   */
+  void fit(Matrix xs, Matrix ys);
 
-  double predict(Matrix features);
+  /**
+   * @param x :: (n × 1)
+   * @return y :: (1 × 1)
+   */
+  double predict(Matrix x);
 
 }

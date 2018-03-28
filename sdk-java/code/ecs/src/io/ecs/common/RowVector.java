@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class RowVector implements Matrix {
 
-  public static Matrix of(double... raw) {
+  public static RowVector of(double... raw) {
     return new RowVector(raw);
   }
 

@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 public class Boost implements Model {
 
-  List<Model> bases;
+  private List<Model> bases;
 
   public Boost(Supplier<Model> factory) {
     bases = Arrays.asList(

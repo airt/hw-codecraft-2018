@@ -19,6 +19,13 @@ public interface Matrix {
   Matrix t();
 
   /**
+   * m<sub>1</sub> + m<sub>2</sub>
+   */
+  default Matrix add(Matrix m) {
+    return NaiveMatrixOps.add(this, m);
+  }
+
+  /**
    * m<sub>1</sub> - m<sub>2</sub>
    */
   default Matrix sub(Matrix m) {
@@ -30,6 +37,13 @@ public interface Matrix {
    */
   default Matrix mul(Matrix m) {
     return NaiveMatrixOps.mul(this, m);
+  }
+
+  /**
+   * c · m<sub>1</sub>
+   */
+  default Matrix mul(double c) {
+    return NaiveMatrixOps.mul(this, c);
   }
 
   /**

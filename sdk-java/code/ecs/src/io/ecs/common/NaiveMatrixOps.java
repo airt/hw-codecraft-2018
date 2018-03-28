@@ -2,6 +2,17 @@ package io.ecs.common;
 
 class NaiveMatrixOps {
 
+  static Matrix add(Matrix lhs, Matrix rhs) {
+    if (lhs.cols() != rhs.cols()) throw new IllegalArgumentException();
+    double[][] np = new double[lhs.rows()][lhs.cols()];
+    for (int i = 0; i < lhs.rows(); i++) {
+      for (int j = 0; j < lhs.cols(); j++) {
+        np[i][j] = lhs.get(i, j) + rhs.get(rhs.rows() == 1 ? 0 : i, j);
+      }
+    }
+    return new NaiveMatrix(np);
+  }
+
   static Matrix sub(Matrix lhs, Matrix rhs) {
     if (lhs.cols() != rhs.cols()) throw new IllegalArgumentException();
     double[][] np = new double[lhs.rows()][lhs.cols()];
@@ -21,6 +32,16 @@ class NaiveMatrixOps {
         int s = 0;
         for (int k = 0; k < lhs.cols(); k++) s += lhs.get(i, k) * rhs.get(k, j);
         np[i][j] = s;
+      }
+    }
+    return new NaiveMatrix(np);
+  }
+
+  static Matrix mul(Matrix lhs, double rhs) {
+    double[][] np = new double[lhs.rows()][lhs.cols()];
+    for (int i = 0; i < lhs.rows(); i++) {
+      for (int j = 0; j < lhs.cols(); j++) {
+        np[i][j] = lhs.get(i, j) * rhs;
       }
     }
     return new NaiveMatrix(np);

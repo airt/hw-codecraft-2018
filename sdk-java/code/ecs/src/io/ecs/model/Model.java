@@ -15,9 +15,13 @@ public interface Model {
   void fit(Matrix xs, Matrix ys);
 
   /**
-   * @param x :: (n × 1)
-   * @return y :: (1 × 1)
+   * @param xs :: (m × n)
+   * @return ys :: (m × 1)
    */
-  double predict(Matrix x);
+  Matrix predict(Matrix xs);
+
+  default String inspect() {
+    return "";
+  }
 
 }

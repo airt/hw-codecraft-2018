@@ -11,7 +11,7 @@ class NN implements Model {
   }
 
   @Override
-  public double predict(Matrix features) {
+  public Matrix predict(Matrix features) {
     return TODO.throwing();
   }
 

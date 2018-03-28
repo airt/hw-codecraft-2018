@@ -1,6 +1,5 @@
 package io.ecs.model;
 
-import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
 
 import java.util.Arrays;
@@ -9,7 +8,7 @@ import java.util.function.Supplier;
 
 public class Boost implements Model {
 
-  private List<Model> bases;
+  List<Model> bases;
 
   public Boost(Supplier<Model> factory) {
     bases = Arrays.asList(
@@ -24,36 +23,33 @@ public class Boost implements Model {
 
     Model base0 = bases.get(0);
     base0.fit(xs, ys);
-    Matrix dys0 = ys.sub(predictBatch(base0, xs));
+    Matrix dys0 = ys.sub(base0.predict(xs));
 
     Model base1 = bases.get(1);
     base1.fit(xs, dys0);
-    Matrix dys1 = dys0.sub(predictBatch(base1, xs));
+    Matrix dys1 = dys0.sub(base1.predict(xs));
 
     Model base2 = bases.get(2);
     base2.fit(xs, dys1);
-    // Matrix dys2 = dys1.sub(predictBatch(base2, xs));
-  }
-
-  /**
-   * TODO: move this method to `model`?
-   */
-  private Matrix predictBatch(Model model, Matrix xs) {
-    double[] np = new double[xs.rows()];
-    for (int i = 0; i < xs.rows(); i++) {
-      Matrix x = xs.row(i).t();
-      np[i] = model.predict(x);
-    }
-    return ColVector.of(np);
   }
 
   @Override
-  public double predict(Matrix x) {
+  public Matrix predict(Matrix xs) {
     return (
-      bases.get(0).predict(x) +
-        bases.get(1).predict(x) +
-        bases.get(2).predict(x)
+      bases.get(0).predict(xs).
+        add(bases.get(1).predict(xs)).
+        add(bases.get(2).predict(xs))
     );
+  }
+
+  @Override
+  public String inspect() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("[Boost]\n");
+    for (Model model : bases) {
+      builder.append(model.inspect().replaceAll("\\[", "[[").replaceAll("]", "]]"));
+    }
+    return builder.toString();
   }
 
 }

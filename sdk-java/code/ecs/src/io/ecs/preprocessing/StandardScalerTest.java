@@ -10,23 +10,28 @@ class StandardScalerTest {
 
   @Test
   void scale() {
-    StandardScaler scaler = new StandardScaler();
     Matrix featuresUnscaled = Matrix.of(new double[][]{
-      {1., -1., 2.},
-      {2., 0., 0.},
-      {0., 1., -1.},
+      {1, -1, 2},
+      {2, 0, 0},
+      {0, 1, -1},
     });
+
+    StandardScaler scaler = new StandardScaler();
     scaler.fit(featuresUnscaled);
     Matrix features = scaler.transform(featuresUnscaled);
+
     Matrix mas = features.meanAndStdOfRows();
     RowVector means = mas.row(0);
     RowVector stds = mas.row(1);
-    for (int j = 0; j < means.cols(); j++) {
-      assertEquals(0, means.get(0, j), 1e-9);
+
+    for (double mean : means) {
+      assertEquals(0, mean, 1e-9);
     }
-    for (int j = 0; j < stds.cols(); j++) {
-      assertEquals(1, stds.get(0, j), 1e-9);
+
+    for (double std : stds) {
+      assertEquals(1, std, 1e-9);
     }
+
     // println("features-unscaled:");
     // println(featuresUnscaled.show());
     // println("features:");

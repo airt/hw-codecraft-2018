@@ -1,8 +1,9 @@
 package io.ecs.common;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
-public class ColVector implements Matrix {
+public class ColVector implements Matrix, Iterable<Double> {
 
   public static ColVector of(double... raw) {
     return new ColVector(raw);
@@ -78,6 +79,31 @@ public class ColVector implements Matrix {
   @Override
   public int cols() {
     return 1;
+  }
+
+  @Override
+  public Iterator<Double> iterator() {
+    return new ColVectorIterator(this);
+  }
+
+  private static class ColVectorIterator implements Iterator<Double> {
+    private int i = -1;
+    private ColVector v;
+
+    private ColVectorIterator(ColVector v) {
+      this.v = v;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return i + 1 < v.rows();
+    }
+
+    @Override
+    public Double next() {
+      i += 1;
+      return v.get(i, 0);
+    }
   }
 
 }

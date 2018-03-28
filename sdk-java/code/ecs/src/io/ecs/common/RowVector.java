@@ -1,8 +1,9 @@
 package io.ecs.common;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
-public class RowVector implements Matrix {
+public class RowVector implements Matrix, Iterable<Double> {
 
   public static RowVector of(double... raw) {
     return new RowVector(raw);
@@ -63,6 +64,31 @@ public class RowVector implements Matrix {
   @Override
   public int cols() {
     return payload.length;
+  }
+
+  @Override
+  public Iterator<Double> iterator() {
+    return new RowVectorIterator(this);
+  }
+
+  private static class RowVectorIterator implements Iterator<Double> {
+    private int i = -1;
+    private RowVector v;
+
+    private RowVectorIterator(RowVector v) {
+      this.v = v;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return i + 1 < v.cols();
+    }
+
+    @Override
+    public Double next() {
+      i += 1;
+      return v.get(0, i);
+    }
   }
 
 }

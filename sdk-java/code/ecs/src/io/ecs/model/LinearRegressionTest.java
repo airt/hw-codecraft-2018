@@ -12,15 +12,17 @@ class LinearRegressionTest {
   void fit() {
     Matrix xs = Matrix.of(new double[][]{
       {1, 0, 0},
+      {1, 0, 1},
       {1, 1, 0},
       {1, 1, 1},
     });
     Matrix ys = Matrix.of(new double[][]{
       {10},
+      {12},
       {20},
       {22},
     });
-    Matrix xt = RowVector.of(1, 0, 1);
+    Matrix xt = RowVector.of(1, 0.5, 0.5);
 
     Model model = new LinearRegression(0.001, 100000);
     model.fit(xs, ys);

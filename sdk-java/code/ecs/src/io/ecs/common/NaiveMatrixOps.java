@@ -29,7 +29,7 @@ class NaiveMatrixOps {
     double[][] np = new double[lhs.rows()][rhs.cols()];
     for (int i = 0; i < lhs.rows(); i++) {
       for (int j = 0; j < rhs.cols(); j++) {
-        int s = 0;
+        double s = 0;
         for (int k = 0; k < lhs.cols(); k++) s += lhs.get(i, k) * rhs.get(k, j);
         np[i][j] = s;
       }

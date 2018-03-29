@@ -12,17 +12,19 @@ class BoostTest {
   void fit() {
     Matrix xs = Matrix.of(new double[][]{
       {1, 0, 0},
+      {1, 0, 1},
       {1, 1, 0},
       {1, 1, 1},
     });
     Matrix ys = Matrix.of(new double[][]{
       {10},
+      {12},
       {20},
       {22},
     });
-    Matrix xt = RowVector.of(1, 0, 1);
+    Matrix xt = RowVector.of(1, 0.5, 0.5);
 
-    Model model = new Boost(() -> new LinearRegression(0.001, 10000));
+    Model model = new Boost(5, i -> new LinearRegression(0.01 * Math.pow(0.1, i), 200));
     model.fit(xs, ys);
     Matrix r = model.predict(xt);
 

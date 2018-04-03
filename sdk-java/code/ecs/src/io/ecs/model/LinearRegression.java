@@ -16,7 +16,7 @@ class LinearRegression implements Model {
 
   @Override
   public void fit(Matrix features, Matrix labels) {
-    theta = ColVector.of(new double[features.cols()]);
+    theta = ColVector.zeros(features.cols());
     int m = features.rows();
     for (int i = 0; i < iterations; i++) {
       theta = theta.sub(

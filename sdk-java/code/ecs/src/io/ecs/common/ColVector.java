@@ -9,6 +9,10 @@ public class ColVector implements Matrix, Iterable<Double> {
     return new ColVector(raw);
   }
 
+  public static ColVector zeros(int n) {
+    return of(new double[n]);
+  }
+
   private final double[] payload;
 
   public ColVector(double[] payload) {

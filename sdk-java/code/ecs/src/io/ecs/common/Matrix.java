@@ -2,16 +2,13 @@ package io.ecs.common;
 
 public interface Matrix {
 
-  static Matrix of(double[]... raw) {
-    return new NaiveMatrix(raw);
+  static Matrix of(double[]... payload) {
+    return new NaiveMatrix(payload);
   }
 
-  /**
-   * m[i, j]
-   * <p>
-   * m[-1, -1] == m[rows - 1, cols - 1]
-   */
-  double get(int row, int col);
+  static Matrix zeros(int i, int j) {
+    return of(new double[i][j]);
+  }
 
   /**
    * transpose
@@ -67,6 +64,13 @@ public interface Matrix {
    * @return matrix m<sub>r</sub> :: (2 × m.cols)
    */
   Matrix maxMinOfRows();
+
+  /**
+   * m[i, j]
+   * <p>
+   * m[-1, -1] == m[rows - 1, cols - 1]
+   */
+  double get(int row, int col);
 
   /**
    * m[i, :]

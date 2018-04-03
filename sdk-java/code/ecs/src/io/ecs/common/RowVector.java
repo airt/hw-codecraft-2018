@@ -9,6 +9,10 @@ public class RowVector implements Matrix, Iterable<Double> {
     return new RowVector(raw);
   }
 
+  public static RowVector zeros(int n) {
+    return of(new double[n]);
+  }
+
   private final double[] payload;
 
   public RowVector(double[] payload) {

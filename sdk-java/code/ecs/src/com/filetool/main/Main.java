@@ -5,9 +5,9 @@ import com.filetool.util.FileUtil;
 import com.filetool.util.LogUtil;
 
 /**
- * 
+ *
  * 工具入口
- * 
+ *
  * @version [版本号, 2017-12-8]
  * @see [相关类/方法]
  * @since [产品/模块版本]
@@ -54,5 +54,4 @@ public class Main {
 		}
 		return false;
 	}
-
 }

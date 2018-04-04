@@ -1,35 +1,28 @@
 package io.ecs.model;
 
 import io.ecs.common.Matrix;
-import io.ecs.common.RowVector;
+import io.ecs.common.Tuple2;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static io.ecs.common.Shortcuts.println;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LinearRegressionTest {
 
-  @Test
-  void fit() {
-    Matrix xs = Matrix.of(new double[][]{
-      {1, 0, 0},
-      {1, 0, 1},
-      {1, 1, 0},
-      {1, 1, 1},
-    });
-    Matrix ys = Matrix.of(new double[][]{
-      {10},
-      {12},
-      {20},
-      {22},
-    });
-    Matrix xt = RowVector.of(1, 0.5, 0.5);
-
-    Model model = new LinearRegression(0.001, 100000);
-    model.fit(xs, ys);
-    Matrix r = model.predict(xt);
-
-    println(model.inspect());
-    println(r.show());
-  }
+    @Test
+    void predict() {
+        Matrix X = Matrix.of(new double[][] {
+                {1, 2},
+                {3, 4},
+        });
+        Matrix Y = Matrix.of(new double[][] {
+                {12, 17},
+        });
+        LinearRegression lr = new LinearRegression(0.001, 50000);
+        lr.fit(X, Y);
+        Matrix m = lr.predict(X);
+        assertEquals("12.00", String.format("%.2f", m.get(0, 0)));
+        assertEquals("17.00", String.format("%.2f", m.get(0, 1)));
+    }
 
 }

@@ -1,40 +1,88 @@
 package io.ecs.model;
 
-import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
+import io.ecs.common.TODO;
+import io.ecs.common.Tuple2;
 
-class LinearRegression implements Model {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-  private Matrix theta;
-  private double alpha;
-  private int iterations;
+/**
+ * 线性回归模型
+ */
+public class LinearRegression implements Model {
 
-  public LinearRegression(double alpha, int iterations) {
-    this.alpha = alpha;
-    this.iterations = iterations;
-  }
+    private Matrix w;
 
-  @Override
-  public void fit(Matrix features, Matrix labels) {
-    theta = ColVector.zeros(features.cols());
-    int m = features.rows();
-    for (int i = 0; i < iterations; i++) {
-      theta = theta.sub(
-        features.t().
-          mul(features.mul(theta).sub(labels)).
-          mul(alpha / m)
-      );
+    private double b;
+
+    private double learning_rate;
+
+    private int num_iterations;
+
+    public LinearRegression(double learning_rate, int num_iterations) {
+        this.learning_rate = learning_rate;
+        this.num_iterations = num_iterations;
     }
-  }
 
-  @Override
-  public Matrix predict(Matrix features) {
-    return features.mul(theta);
-  }
+    @Override
+    public void fit(Matrix X, Matrix Y) {
+        if (X.rows() != Y.rows()) {
+            try {
+                throw new Exception("Features rows not equeals labels!");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-  @Override
-  public String inspect() {
-    return "[LinearRegression]\n" + "  θ =\n" + theta.show();
-  }
+        Matrix w = Functions.initialize_w_zeros(X.rows());
+        double b = 0.0;
+        Tuple2<Matrix, Double> tuple2 = optimize(w, b, X, Y, num_iterations, learning_rate, false);
+        this.w = tuple2._1();
+        this.b = tuple2._2();
+    }
 
+
+    public Tuple2<Matrix, double []> propagate(Matrix w, double b, Matrix X, Matrix Y) {
+        double m = X.shape()._2();
+
+        Matrix A = w.t().mul(X).add(b);
+
+        double cost = Functions.square(A.sub(Y)).sum() / (2.0*m);
+
+        Matrix dw = X.mul(A.sub(Y).t()).dotDiv(m);
+        double db = A.sub(Y).sum() / m;
+        double[] t2 = {db, cost};
+        return Tuple2.of(dw, t2);
+    }
+
+    public Tuple2<Matrix, Double> optimize(Matrix w, double b, Matrix X, Matrix Y, int num_iterations, double learning_rate, boolean print_cost) {
+        List<Double> costs = new ArrayList<>();
+        Matrix dw = null;
+        double db = 0.0;
+        for (int i = 0; i < num_iterations; i++) {
+            Tuple2<Matrix, double[]> tuple2 = propagate(w, b, X, Y);
+            dw = tuple2._1();
+            db = tuple2._2()[0];
+            double cost = tuple2._2()[1];
+
+            w = w.sub(dw.mul(learning_rate));
+            b = b - learning_rate * db;
+
+            if (i % 100 == 0) {
+                costs.add(cost);
+            }
+            if (print_cost && i % 100 == 0) {
+                System.out.printf("Cost after iteration %d: %f", i, cost);
+                System.out.println();
+            }
+        }
+        return Tuple2.of(w, b);
+    }
+
+    @Override
+    public Matrix predict(Matrix X) {
+        return w.t().mul(X).add(b);
+    }
 }

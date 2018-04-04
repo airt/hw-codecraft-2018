@@ -22,6 +22,10 @@ public interface Matrix {
     return NaiveMatrixOps.add(this, m);
   }
 
+  default Matrix add(double b) {
+	  return NaiveMatrixOps.add(this, b);
+  }
+
   /**
    * m<sub>1</sub> - m<sub>2</sub>
    */
@@ -43,6 +47,10 @@ public interface Matrix {
     return NaiveMatrixOps.mul(this, c);
   }
 
+  default Matrix dotMul(Matrix m) {
+	  return NaiveMatrixOps.dotMul(this, m);
+  }
+
   /**
    * m<sub>1</sub> ./ m<sub>2</sub>
    */
@@ -50,6 +58,9 @@ public interface Matrix {
     return NaiveMatrixOps.dotDiv(this, m);
   }
 
+  default Matrix dotDiw(double b) {
+	  return NaiveMatrixOps.dotDiv(this, b);
+  }
   /**
    * @return matrix m<sub>r</sub> :: (1 × m.cols)
    */
@@ -101,6 +112,10 @@ public interface Matrix {
 
   default String show() {
     return NaiveMatrixOps.show(this);
+  }
+
+  default double sum() {
+	  return NaiveMatrixOps.sum(this);
   }
 
 }

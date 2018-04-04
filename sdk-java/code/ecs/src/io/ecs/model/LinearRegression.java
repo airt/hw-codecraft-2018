@@ -36,7 +36,7 @@ public class LinearRegression implements Model {
             }
         }
 
-        Matrix w = Functions.initialize_w_zeros(X.rows());
+        Matrix w = Numpy.initialize_w_zeros(X.rows());
         double b = 0.0;
         Tuple2<Matrix, Double> tuple2 = optimize(w, b, X, Y, num_iterations, learning_rate, false);
         this.w = tuple2._1();
@@ -49,7 +49,7 @@ public class LinearRegression implements Model {
 
         Matrix A = w.t().mul(X).add(b);
 
-        double cost = Functions.square(A.sub(Y)).sum() / (2.0*m);
+        double cost = Numpy.square(A.sub(Y)).sum() / (2.0*m);
 
         Matrix dw = X.mul(A.sub(Y).t()).dotDiv(m);
         double db = A.sub(Y).sum() / m;

@@ -58,7 +58,7 @@ public interface Matrix {
     return NaiveMatrixOps.dotDiv(this, m);
   }
 
-  default Matrix dotDiw(double b) {
+  default Matrix dotDiv(double b) {
 	  return NaiveMatrixOps.dotDiv(this, b);
   }
   /**

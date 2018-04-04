@@ -2,96 +2,104 @@ package io.ecs.common;
 
 class NaiveMatrixOps {
 
-  static Matrix add(Matrix lhs, Matrix rhs) {
-    if (lhs.cols() != rhs.cols())
-      throw new IllegalArgumentException();
-    double[][] np = new double[lhs.rows()][lhs.cols()];
-    for (int i = 0; i < lhs.rows(); i++) {
-      for (int j = 0; j < lhs.cols(); j++) {
-        np[i][j] = lhs.get(i, j) + rhs.get(rhs.rows() == 1 ? 0 : i, j);
-      }
-    }
-    return new NaiveMatrix(np);
-  }
-
-  static Matrix add(Matrix lhs, double b) {
-    double[][] ans = new double[lhs.rows()][lhs.cols()];
-    for (int i = 0; i < lhs.rows(); i++) {
-        for (int j = 0; j < lhs.cols(); j++) {
-            ans[i][j] = lhs.get(i, j) + b;
+    static Matrix add(Matrix lhs, Matrix rhs) {
+        double[][] np = new double[lhs.rows()][lhs.cols()];
+        if (lhs.cols() == rhs.cols()) {
+            for (int i = 0; i < lhs.rows(); i++) {
+                for (int j = 0; j < lhs.cols(); j++) {
+                    np[i][j] = lhs.get(i, j) + rhs.get(rhs.rows() == 1 ? 0 : i, j);
+                }
+            }
+        } else if (lhs.rows() == rhs.rows()) {
+            for (int i = 0; i < lhs.rows(); i++) {
+                for (int j = 0; j < lhs.cols(); j++) {
+                    np[i][j] = lhs.get(i, j) + rhs.get(i, rhs.cols() == 1 ? 0 : j);
+                }
+            }
+        } else {
+            throw new IllegalArgumentException();
         }
+        return new NaiveMatrix(np);
     }
-    return new NaiveMatrix(ans);
-  }
 
-  static Matrix sub(Matrix lhs, Matrix rhs) {
-    if (lhs.cols() != rhs.cols())
-      throw new IllegalArgumentException();
-    double[][] np = new double[lhs.rows()][lhs.cols()];
-    for (int i = 0; i < lhs.rows(); i++) {
-      for (int j = 0; j < lhs.cols(); j++) {
-        np[i][j] = lhs.get(i, j) - rhs.get(rhs.rows() == 1 ? 0 : i, j);
-      }
-    }
-    return new NaiveMatrix(np);
-  }
-
-  static Matrix mul(Matrix lhs, Matrix rhs) {
-    if (lhs.cols() != rhs.rows())
-      throw new IllegalArgumentException();
-    double[][] np = new double[lhs.rows()][rhs.cols()];
-    for (int i = 0; i < lhs.rows(); i++) {
-      for (int j = 0; j < rhs.cols(); j++) {
-        double s = 0;
-        for (int k = 0; k < lhs.cols(); k++)
-          s += lhs.get(i, k) * rhs.get(k, j);
-        np[i][j] = s;
-      }
-    }
-    return new NaiveMatrix(np);
-  }
-
-  static Matrix mul(Matrix lhs, double rhs) {
-    double[][] np = new double[lhs.rows()][lhs.cols()];
-    for (int i = 0; i < lhs.rows(); i++) {
-      for (int j = 0; j < lhs.cols(); j++) {
-        np[i][j] = lhs.get(i, j) * rhs;
-      }
-    }
-    return new NaiveMatrix(np);
-  }
-
-  static Matrix dotMul(Matrix lhs, Matrix rhs) {
-    double[][] np = new double[lhs.rows()][lhs.cols()];
-    if (lhs.cols() == rhs.cols()) {
+    static Matrix add(Matrix lhs, double b) {
+        double[][] ans = new double[lhs.rows()][lhs.cols()];
         for (int i = 0; i < lhs.rows(); i++) {
             for (int j = 0; j < lhs.cols(); j++) {
-                np[i][j] = lhs.get(i, j) * rhs.get(rhs.rows() == 1 ? 0 : i, j);
+                ans[i][j] = lhs.get(i, j) + b;
             }
         }
-    } else if (lhs.rows() == rhs.rows()) {
+        return new NaiveMatrix(ans);
+    }
+
+    static Matrix sub(Matrix lhs, Matrix rhs) {
+        if (lhs.cols() != rhs.cols())
+            throw new IllegalArgumentException();
+        double[][] np = new double[lhs.rows()][lhs.cols()];
         for (int i = 0; i < lhs.rows(); i++) {
             for (int j = 0; j < lhs.cols(); j++) {
-                np[i][j] = lhs.get(i, j) * rhs.get(i, rhs.cols() == 1 ? 0 : j);
+                np[i][j] = lhs.get(i, j) - rhs.get(rhs.rows() == 1 ? 0 : i, j);
             }
         }
-    } else {
-        throw new IllegalArgumentException();
+        return new NaiveMatrix(np);
     }
-    return new NaiveMatrix(np);
-  }
 
-  static Matrix dotDiv(Matrix lhs, Matrix rhs) {
-    if (lhs.cols() != rhs.cols())
-      throw new IllegalArgumentException();
-    double[][] np = new double[lhs.rows()][lhs.cols()];
-    for (int i = 0; i < lhs.rows(); i++) {
-      for (int j = 0; j < lhs.cols(); j++) {
-        np[i][j] = lhs.get(i, j) / rhs.get(rhs.rows() == 1 ? 0 : i, j);
-      }
+    static Matrix mul(Matrix lhs, Matrix rhs) {
+        if (lhs.cols() != rhs.rows())
+            throw new IllegalArgumentException();
+        double[][] np = new double[lhs.rows()][rhs.cols()];
+        for (int i = 0; i < lhs.rows(); i++) {
+            for (int j = 0; j < rhs.cols(); j++) {
+                double s = 0;
+                for (int k = 0; k < lhs.cols(); k++)
+                    s += lhs.get(i, k) * rhs.get(k, j);
+                np[i][j] = s;
+            }
+        }
+        return new NaiveMatrix(np);
     }
-    return new NaiveMatrix(np);
-  }
+
+    static Matrix mul(Matrix lhs, double rhs) {
+        double[][] np = new double[lhs.rows()][lhs.cols()];
+        for (int i = 0; i < lhs.rows(); i++) {
+            for (int j = 0; j < lhs.cols(); j++) {
+                np[i][j] = lhs.get(i, j) * rhs;
+            }
+        }
+        return new NaiveMatrix(np);
+    }
+
+    static Matrix dotMul(Matrix lhs, Matrix rhs) {
+        double[][] np = new double[lhs.rows()][lhs.cols()];
+        if (lhs.cols() == rhs.cols()) {
+            for (int i = 0; i < lhs.rows(); i++) {
+                for (int j = 0; j < lhs.cols(); j++) {
+                    np[i][j] = lhs.get(i, j) * rhs.get(rhs.rows() == 1 ? 0 : i, j);
+                }
+            }
+        } else if (lhs.rows() == rhs.rows()) {
+            for (int i = 0; i < lhs.rows(); i++) {
+                for (int j = 0; j < lhs.cols(); j++) {
+                    np[i][j] = lhs.get(i, j) * rhs.get(i, rhs.cols() == 1 ? 0 : j);
+                }
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+        return new NaiveMatrix(np);
+    }
+
+    static Matrix dotDiv(Matrix lhs, Matrix rhs) {
+        if (lhs.cols() != rhs.cols())
+            throw new IllegalArgumentException();
+        double[][] np = new double[lhs.rows()][lhs.cols()];
+        for (int i = 0; i < lhs.rows(); i++) {
+            for (int j = 0; j < lhs.cols(); j++) {
+                np[i][j] = lhs.get(i, j) / rhs.get(rhs.rows() == 1 ? 0 : i, j);
+            }
+        }
+        return new NaiveMatrix(np);
+    }
 
 
     static Matrix dotDiv(Matrix lhs, double rhs) {

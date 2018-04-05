@@ -6,7 +6,7 @@ public class TODO {
         throw new NotImplementedError();
     }
 
-    public static class NotImplementedError extends RuntimeException {
+    static class NotImplementedError extends RuntimeException {
     }
 
 }

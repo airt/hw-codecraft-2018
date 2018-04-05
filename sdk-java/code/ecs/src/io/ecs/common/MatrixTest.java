@@ -18,16 +18,11 @@ class MatrixTest {
     }
 
     @Test
-    void get() {
-        assertEquals(6, m.get(1, 2));
-        assertEquals(6, m.get(-1, -1));
-    }
-
-    @Test
-    void t() {
-        Matrix mt = m.t();
-        assertEquals(Tuple2.of(3, 2), mt.shape());
-        assertEquals(6, mt.get(2, 1));
+    void zeros() {
+        Matrix m0 = Matrix.zeros(10, 10);
+        assertEquals(Tuple2.of(10, 10), m0.shape());
+        assertEquals(0, m0.get(0, 0));
+        assertEquals(0, m0.get(9, 9));
     }
 
     @Test
@@ -42,6 +37,13 @@ class MatrixTest {
         assertEquals(50, mm.get(0, 0));
         assertEquals(122, mm.get(1, 0));
         assertEquals(167, mm.get(1, 1));
+    }
+
+    @Test
+    void t() {
+        Matrix mm = m.t();
+        assertEquals(Tuple2.of(3, 2), mm.shape());
+        assertEquals(6, mm.get(2, 1));
     }
 
     @Test
@@ -63,21 +65,6 @@ class MatrixTest {
         assertEquals(2.1213, mm.get(1, 0), 0.001);
         assertEquals(2.1213, mm.get(1, 1), 0.001);
         assertEquals(2.1213, mm.get(1, 2), 0.001);
-    }
-
-    @Test
-    void maxMinOfRows() {
-        try {
-            Matrix mm = m.maxMinOfRows();
-            assertEquals(Tuple2.of(2, 3), mm.shape());
-            assertEquals(4, mm.get(0, 0));
-            assertEquals(5, mm.get(0, 1));
-            assertEquals(6, mm.get(0, 2));
-            assertEquals(1, mm.get(1, 0));
-            assertEquals(2, mm.get(1, 1));
-            assertEquals(3, mm.get(1, 2));
-        } catch (TODO.NotImplementedError ignored) {
-        }
     }
 
     @Test
@@ -105,17 +92,47 @@ class MatrixTest {
     }
 
     @Test
+    void zipRow() {
+        Matrix mm = m.zip(m.row(0), (i, j, x, y) -> (i + 1) * 1000 + (j + 1) * 100 + x * 10 + y);
+        assertEquals(Tuple2.of(2, 3), mm.shape());
+        assertEquals(1111, mm.get(0, 0));
+        assertEquals(1222, mm.get(0, 1));
+        assertEquals(1333, mm.get(0, 2));
+        assertEquals(2141, mm.get(1, 0));
+        assertEquals(2252, mm.get(1, 1));
+        assertEquals(2363, mm.get(1, 2));
+    }
+
+    @Test
+    void zipCol() {
+        Matrix mm = m.zip(m.col(0), (i, j, x, y) -> (i + 1) * 1000 + (j + 1) * 100 + x * 10 + y);
+        assertEquals(Tuple2.of(2, 3), mm.shape());
+        assertEquals(1111, mm.get(0, 0));
+        assertEquals(1221, mm.get(0, 1));
+        assertEquals(1331, mm.get(0, 2));
+        assertEquals(2144, mm.get(1, 0));
+        assertEquals(2254, mm.get(1, 1));
+        assertEquals(2364, mm.get(1, 2));
+    }
+
+    @Test
+    void get() {
+        assertEquals(6, m.get(1, 2));
+        assertEquals(6, m.get(-1, -1));
+    }
+
+    @Test
     void row() {
-        RowVector vs = m.row(-1);
-        assertEquals(Tuple2.of(1, 3), vs.shape());
-        assertEquals(6, vs.get(0, 2));
+        Matrix mm = m.row(-1);
+        assertEquals(Tuple2.of(1, 3), mm.shape());
+        assertEquals(6, mm.get(0, 2));
     }
 
     @Test
     void col() {
-        ColVector vs = m.col(-1);
-        assertEquals(Tuple2.of(2, 1), vs.shape());
-        assertEquals(6, vs.get(1, 0));
+        Matrix mm = m.col(-1);
+        assertEquals(Tuple2.of(2, 1), mm.shape());
+        assertEquals(6, mm.get(1, 0));
     }
 
     @Test

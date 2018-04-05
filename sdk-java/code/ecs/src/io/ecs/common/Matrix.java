@@ -2,24 +2,27 @@ package io.ecs.common;
 
 import io.ecs.common.function.IntIntDoubleDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntDoubleToDoubleFunction;
+import io.ecs.common.function.IntIntToDoubleFunction;
+import io.ecs.common.matrix.impl.NaiveMatrix;
+import io.ecs.common.matrix.impl.NaiveMatrixOps;
+import io.ecs.common.matrix.impl.ZerosMatrix;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 
 public interface Matrix {
 
-    static Matrix of(double[]... payload) {
-        return new NaiveMatrix(payload);
+    static Matrix of(double[]... values) {
+        return new NaiveMatrix(values);
     }
 
-    static Matrix zeros(int i, int j) {
-        return of(new double[i][j]);
+    static Matrix of(int nRows, int nCols, IntIntToDoubleFunction f) {
+        return zeros(nRows, nCols).map((i, j, x) -> f.apply(i, j));
     }
 
-    /**
-     * transpose
-     */
-    Matrix t();
+    static Matrix zeros(int nRows, int nCols) {
+        return new ZerosMatrix(nRows, nCols);
+    }
 
     default Matrix add(double n) {
         return map(x -> x + n);
@@ -58,19 +61,23 @@ public interface Matrix {
     }
 
     /**
+     * transpose
+     */
+    Matrix t();
+
+    /**
      * @return matrix m<sub>r</sub> :: (1 × nCols)
      */
-    Matrix meanOfRows();
+    default Matrix meanOfRows() {
+        return NaiveMatrixOps.meanOfRows(this);
+    }
 
     /**
      * @return matrix m<sub>r</sub> :: (2 × nCols)
      */
-    Matrix meanAndStdOfRows();
-
-    /**
-     * @return matrix m<sub>r</sub> :: (2 × nCols)
-     */
-    Matrix maxMinOfRows();
+    default Matrix meanAndStdOfRows() {
+        return NaiveMatrixOps.meanAndStdOfRows(this);
+    }
 
     default double sum() {
         return NaiveMatrixOps.sum(this);

@@ -133,4 +133,28 @@ class NaiveMatrixOps {
         return re;
     }
 
+    static Matrix rowSum(Matrix m) {
+        double[][] np = new double[m.rows()][1];
+        for (int i = 0; i < m.rows(); i++) {
+            double sum = 0.0;
+            for (int j = 0; j < m.cols(); j++) {
+                sum += m.get(i, j);
+            }
+            np[i][0] = sum;
+        }
+        return new NaiveMatrix(np);
+    }
+
+    static Matrix colSum(Matrix m) {
+        double[][] np = new double[1][m.cols()];
+        for (int i = 0; i < m.cols(); i++) {
+            double sum = 0.0;
+            for (int j = 0; j < m.rows(); j++) {
+                sum += m.get(j, i);
+            }
+            np[0][i] = sum;
+        }
+        return new NaiveMatrix(np);
+    }
+
 }

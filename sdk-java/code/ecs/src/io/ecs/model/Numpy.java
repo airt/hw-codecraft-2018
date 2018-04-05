@@ -48,7 +48,7 @@ public class Numpy {
     // 生成rows*cols的随机正态分布
     public static Matrix randomRandn(int rows, int cols) {
         double[][] m = new double[rows][cols];
-        Random random = new Random();
+        Random random = new Random(1);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 m[i][j] = random.nextGaussian();
@@ -61,9 +61,15 @@ public class Numpy {
         double[][] m = new double[x2.rows()][x2.cols()];
         for (int i = 0; i < x2.rows(); i++) {
             for (int j = 0; j < x2.cols(); j++) {
-                m[i][j] = x1 > x2.get(i, j) ? x2.get(i, j) : x1;
+                m[i][j] = x1 > x2.get(i, j) ? x1 : x2.get(i, j);
             }
         }
         return Matrix.of(m);
+    }
+
+    public static double mean(Matrix x) {
+        int rows = x.rows();
+        int cols = x.cols();
+        return x.sum() / (rows * cols);
     }
 }

@@ -1,5 +1,11 @@
 package io.ecs.common;
 
+import io.ecs.common.function.IntIntDoubleDoubleToDoubleFunction;
+import io.ecs.common.function.IntIntDoubleToDoubleFunction;
+
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
+
 public interface Matrix {
 
     static Matrix of(double[]... payload) {
@@ -15,71 +21,95 @@ public interface Matrix {
      */
     Matrix t();
 
-    /**
-     * m<sub>1</sub> + m<sub>2</sub>
-     */
+    default Matrix add(double n) {
+        return map(x -> x + n);
+    }
+
     default Matrix add(Matrix m) {
-        return NaiveMatrixOps.add(this, m);
+        return zip(m, (x, y) -> x + y);
     }
 
-    default Matrix add(double b) {
-        return NaiveMatrixOps.add(this, b);
+    default Matrix sub(double n) {
+        return map(x -> x - n);
     }
 
-    /**
-     * m<sub>1</sub> - m<sub>2</sub>
-     */
     default Matrix sub(Matrix m) {
-        return NaiveMatrixOps.sub(this, m);
+        return zip(m, (x, y) -> x - y);
     }
 
-    /**
-     * m<sub>1</sub> · m<sub>2</sub>
-     */
+    default Matrix mul(double n) {
+        return map(x -> x * n);
+    }
+
     default Matrix mul(Matrix m) {
         return NaiveMatrixOps.mul(this, m);
     }
 
-    /**
-     * c · m<sub>1</sub>
-     */
-    default Matrix mul(double c) {
-        return NaiveMatrixOps.mul(this, c);
-    }
-
     default Matrix dotMul(Matrix m) {
-        return NaiveMatrixOps.dotMul(this, m);
+        return zip(m, (x, y) -> x * y);
     }
 
-    /**
-     * m<sub>1</sub> ./ m<sub>2</sub>
-     */
+    default Matrix dotDiv(double n) {
+        return map(x -> x / n);
+    }
+
     default Matrix dotDiv(Matrix m) {
-        return NaiveMatrixOps.dotDiv(this, m);
+        return zip(m, (x, y) -> x / y);
     }
 
-    default Matrix dotDiv(double b) {
-        return NaiveMatrixOps.dotDiv(this, b);
-    }
     /**
-     * @return matrix m<sub>r</sub> :: (1 × m.cols)
+     * @return matrix m<sub>r</sub> :: (1 × nCols)
      */
     Matrix meanOfRows();
 
     /**
-     * @return matrix m<sub>r</sub> :: (2 × m.cols)
+     * @return matrix m<sub>r</sub> :: (2 × nCols)
      */
     Matrix meanAndStdOfRows();
 
     /**
-     * @return matrix m<sub>r</sub> :: (2 × m.cols)
+     * @return matrix m<sub>r</sub> :: (2 × nCols)
      */
     Matrix maxMinOfRows();
+
+    default double sum() {
+        return NaiveMatrixOps.sum(this);
+    }
+
+    /**
+     * @return matrix m<sub>r</sub> :: (nRows × 1)
+     */
+    default Matrix rowSum() {
+        return NaiveMatrixOps.rowSum(this);
+    }
+
+    /**
+     * @return matrix m<sub>r</sub> :: (1 × nCols)
+     */
+    default Matrix colSum() {
+        return NaiveMatrixOps.colSum(this);
+    }
+
+    default Matrix map(DoubleUnaryOperator f) {
+        return map((i, j, x) -> f.applyAsDouble(x));
+    }
+
+    default Matrix map(IntIntDoubleToDoubleFunction f) {
+        return NaiveMatrixOps.map(this, f);
+    }
+
+    default Matrix zip(Matrix m, DoubleBinaryOperator f) {
+        return zip(m, (i, j, x, y) -> f.applyAsDouble(x, y));
+    }
+
+    default Matrix zip(Matrix m, IntIntDoubleDoubleToDoubleFunction f) {
+        return NaiveMatrixOps.zip(this, m, f);
+    }
 
     /**
      * m[i, j]
      * <p>
-     * m[-1, -1] == m[rows - 1, cols - 1]
+     * m[-1, -1] == m[nRows - 1, nCols - 1]
      */
     double get(int row, int col);
 
@@ -104,7 +134,7 @@ public interface Matrix {
     int cols();
 
     /**
-     * (rows, cols)
+     * (nRows, nCols)
      */
     default Tuple2<Integer, Integer> shape() {
         return Tuple2.of(rows(), cols());
@@ -114,21 +144,4 @@ public interface Matrix {
         return NaiveMatrixOps.show(this);
     }
 
-    default double sum() {
-        return NaiveMatrixOps.sum(this);
-    }
-
-    /**
-     * 矩阵行求和，(rows, 1)
-     */
-    default Matrix rowSum() {
-        return NaiveMatrixOps.rowSum(this);
-    }
-
-    /**
-     * 矩阵列求和，(1, cols）
-     */
-    default Matrix colSum() {
-        return NaiveMatrixOps.colSum(this);
-    }
 }

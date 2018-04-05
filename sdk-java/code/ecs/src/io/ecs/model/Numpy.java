@@ -4,72 +4,54 @@ import io.ecs.common.Matrix;
 
 import java.util.Random;
 
+@SuppressWarnings({"WeakerAccess", "SpellCheckingInspection", "unused"})
 public class Numpy {
 
-    public static Matrix sigmoid(Matrix z) {
-        double[][] s = new double[z.rows()][z.cols()];
-        for (int i = 0; i < z.rows(); i++) {
-            for (int j = 0; j < z.cols(); j++) {
-                s[i][j] = 1.0 / (1.0 + Math.exp(-1 * z.get(i, j)));
-            }
-        }
-        return Matrix.of(s);
+    public static Matrix sigmoid(Matrix m) {
+        return m.map(Numpy::sigmoid);
     }
 
-    // 初始化w
+    public static double sigmoid(double n) {
+        return 1.0 / (1.0 + Math.exp(-1 * n));
+    }
+
+    // 初始化 w
     public static Matrix initialize_w_zeros(int dim) {
-        double[][] ans = new double[dim][1];
-        for (int i = 0; i < ans.length; i++) {
-            ans[i][0] = 0.0;
-        }
-        return Matrix.of(ans);
+        return Matrix.zeros(dim, 1);
     }
 
     public static Matrix log(Matrix m) {
-        double[][] ans = new double[m.rows()][m.cols()];
-        for (int i = 0; i < m.rows(); i++) {
-            for (int j = 0; j < m.cols(); j++) {
-                ans[i][j] = Math.log(m.get(i, j));
-            }
-        }
-        return Matrix.of(ans);
+        return m.map(Math::log);
     }
 
     public static Matrix square(Matrix m) {
-        double[][] ans = new double[m.rows()][m.cols()];
-        for (int i = 0; i < m.rows(); i++) {
-            for (int j = 0; j < m.cols(); j++) {
-                ans[i][j] = Math.pow(m.get(i, j), 2);
-            }
-        }
-        return Matrix.of(ans);
+        return m.map(x -> x * x);
     }
 
-    // 生成rows*cols的随机正态分布
+    // 生成 rows × cols 的随机正态分布矩阵
     public static Matrix randomRandn(int rows, int cols) {
-        double[][] m = new double[rows][cols];
-        Random random = new Random(1);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                m[i][j] = random.nextGaussian();
-            }
-        }
-        return Matrix.of(m);
+        final Random random = new Random(1);
+        return Matrix.of(rows, cols, random::nextGaussian);
     }
 
-    public static Matrix maximum(double x1, Matrix x2) {
-        double[][] m = new double[x2.rows()][x2.cols()];
-        for (int i = 0; i < x2.rows(); i++) {
-            for (int j = 0; j < x2.cols(); j++) {
-                m[i][j] = x1 > x2.get(i, j) ? x1 : x2.get(i, j);
-            }
-        }
-        return Matrix.of(m);
+    public static Matrix maximum(Matrix m, double n) {
+        return m.map(x -> Math.max(x, n));
     }
 
-    public static double mean(Matrix x) {
-        int rows = x.rows();
-        int cols = x.cols();
-        return x.sum() / (rows * cols);
+    public static Matrix maximum(double n, Matrix m) {
+        return maximum(m, n);
     }
+
+    public static Matrix minimum(Matrix m, double n) {
+        return m.map(x -> Math.min(x, n));
+    }
+
+    public static Matrix minimum(double n, Matrix m) {
+        return minimum(m, n);
+    }
+
+    public static double mean(Matrix m) {
+        return m.sum() / (m.rows() * m.cols());
+    }
+
 }

@@ -8,12 +8,17 @@ import io.ecs.common.matrix.impl.NaiveMatrixOps;
 import io.ecs.common.matrix.impl.ZerosMatrix;
 
 import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 
 public interface Matrix {
 
     static Matrix of(double[]... values) {
         return new NaiveMatrix(values);
+    }
+
+    static Matrix of(int nRows, int nCols, DoubleSupplier f) {
+        return of(nRows, nCols, (i, j) -> f.getAsDouble());
     }
 
     static Matrix of(int nRows, int nCols, IntIntToDoubleFunction f) {

@@ -1,5 +1,6 @@
 package io.ecs.common;
 
+import io.ecs.common.matrix.impl.ConstantMatrix;
 import io.ecs.common.matrix.impl.NaiveRowVector;
 
 public interface RowVector extends Vector {
@@ -8,8 +9,12 @@ public interface RowVector extends Vector {
         return new NaiveRowVector(values);
     }
 
-    static RowVector zeros(int n) {
-        return of(new double[n]);
+    static RowVector zeros(int nCols) {
+        return new ConstantMatrix(1, nCols);
+    }
+
+    static RowVector ones(int nCols) {
+        return new ConstantMatrix(1, nCols, 1);
     }
 
 }

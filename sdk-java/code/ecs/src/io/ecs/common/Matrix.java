@@ -26,7 +26,7 @@ public interface Matrix {
     }
 
     static Matrix zeros(int nRows, int nCols) {
-        return new ZerosMatrix(nRows, nCols);
+        return new ConstantMatrix(nRows, nCols);
     }
 
     default Matrix add(double n) {

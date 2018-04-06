@@ -7,34 +7,40 @@ import io.ecs.common.iterator.ConstantIterator;
 
 import java.util.Iterator;
 
-public class ZerosMatrix implements Matrix, RowVector, ColVector {
+public class ConstantMatrix implements Matrix, RowVector, ColVector {
 
     private final int nRows;
     private final int nCols;
+    private final double value;
 
-    public ZerosMatrix(int nRows, int nCols) {
+    public ConstantMatrix(int nRows, int nCols) {
+        this(nRows, nCols, 0);
+    }
+
+    public ConstantMatrix(int nRows, int nCols, double value) {
         this.nRows = nRows;
         this.nCols = nCols;
+        this.value = value;
     }
 
     @Override
     public Matrix t() {
-        return new ZerosMatrix(cols(), rows());
+        return new ConstantMatrix(cols(), rows(), value);
     }
 
     @Override
     public double get(int row, int col) {
-        return 0;
+        return value;
     }
 
     @Override
     public RowVector row(int row) {
-        return new ZerosMatrix(1, cols());
+        return new ConstantMatrix(1, cols(), value);
     }
 
     @Override
     public ColVector col(int col) {
-        return new ZerosMatrix(rows(), 1);
+        return new ConstantMatrix(rows(), 1, value);
     }
 
     @Override
@@ -50,9 +56,9 @@ public class ZerosMatrix implements Matrix, RowVector, ColVector {
     @Override
     public Iterator<Double> iterator() {
         // as row vector
-        if (rows() == 1) return ConstantIterator.of(0, cols());
+        if (rows() == 1) return ConstantIterator.of(value, cols());
         // as col vector
-        if (cols() == 1) return ConstantIterator.of(0, rows());
+        if (cols() == 1) return ConstantIterator.of(value, rows());
         // not vector
         throw new IllegalStateException();
     }

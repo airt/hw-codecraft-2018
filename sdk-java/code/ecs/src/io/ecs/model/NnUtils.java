@@ -1,7 +1,6 @@
 package io.ecs.model;
 
 import io.ecs.common.Matrix;
-import io.ecs.common.Tuple2;
 
 import java.util.HashMap;
 
@@ -26,17 +25,17 @@ public class NnUtils {
     }
 
     public static HashMap<String, Matrix> linearBackward(Matrix dZ, HashMap<String, Matrix> cache) {
-        Matrix A_prev = cache.get("A");
+        Matrix A_prev = cache.get("A_prev");
         Matrix W = cache.get("W");
-        int m = A_prev.shape()._2();
+        double m = A_prev.shape()._2();
         Matrix dW = dZ.mul(A_prev.t()).dotDiv(m);
         Matrix db = dZ.rowSum().dotDiv(m);
         Matrix dA_prev = W.t().mul(dZ);
 
         HashMap<String, Matrix> re = new HashMap<>();
+        re.put("dA", dA_prev);
         re.put("dW", dW);
         re.put("db", db);
-        re.put("dA", dA_prev);
 
         return re;
     }

@@ -5,11 +5,14 @@ import io.ecs.common.function.IntIntDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntToDoubleFunction;
 import io.ecs.common.matrix.impl.NaiveMatrix;
 import io.ecs.common.matrix.impl.NaiveMatrixOps;
+import io.ecs.common.matrix.impl.TransposedMatrix;
 import io.ecs.common.matrix.impl.ZerosMatrix;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
+
+import static io.ecs.common.Shortcuts.throwing;
 
 public interface Matrix {
 
@@ -68,7 +71,9 @@ public interface Matrix {
     /**
      * transpose
      */
-    Matrix t();
+    default Matrix t() {
+        return new TransposedMatrix(this);
+    }
 
     /**
      * @return matrix m<sub>r</sub> :: (1 × nCols)
@@ -100,6 +105,22 @@ public interface Matrix {
      */
     default Matrix colSum() {
         return NaiveMatrixOps.colSum(this);
+    }
+
+    default Matrix concat(Matrix m, int axis) {
+        return (
+            axis == 0 ? concatVertical(m) :
+                axis == 1 ? concatHorizontal(m) :
+                    throwing(new IllegalArgumentException("axis = " + axis))
+        );
+    }
+
+    default Matrix concatVertical(Matrix m) {
+        return TODO.throwing();
+    }
+
+    default Matrix concatHorizontal(Matrix m) {
+        return TODO.throwing();
     }
 
     default Matrix map(DoubleUnaryOperator f) {

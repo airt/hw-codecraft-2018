@@ -24,7 +24,7 @@ public class NaiveRowVector implements RowVector {
     }
 
     @Override
-    public Matrix t() {
+    public ColVector t() {
         return ColVector.of(payload);
     }
 

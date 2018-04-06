@@ -9,8 +9,8 @@ public class Tuple2<T1, T2> {
         return new Tuple2<>(_1, _2);
     }
 
-    private final T1 _1;
-    private final T2 _2;
+    public final T1 _1;
+    public final T2 _2;
 
     private Tuple2(T1 _1, T2 _2) {
         this._1 = _1;

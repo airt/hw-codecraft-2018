@@ -9,20 +9,12 @@ public class IntTuple2 {
         return new IntTuple2(_1, _2);
     }
 
-    private final int _1;
-    private final int _2;
+    public final int _1;
+    public final int _2;
 
     private IntTuple2(int _1, int _2) {
         this._1 = _1;
         this._2 = _2;
-    }
-
-    public int _1() {
-        return _1;
-    }
-
-    public int _2() {
-        return _2;
     }
 
     @Override
@@ -35,7 +27,7 @@ public class IntTuple2 {
 
     @Override
     public int hashCode() {
-        return Objects.hash(_1, _2);
+        return 31 * _1 + _2;
     }
 
     @Override

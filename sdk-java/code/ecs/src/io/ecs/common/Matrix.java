@@ -3,10 +3,7 @@ package io.ecs.common;
 import io.ecs.common.function.IntIntDoubleDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntToDoubleFunction;
-import io.ecs.common.matrix.impl.NaiveMatrix;
-import io.ecs.common.matrix.impl.NaiveMatrixOps;
-import io.ecs.common.matrix.impl.TransposedMatrix;
-import io.ecs.common.matrix.impl.ZerosMatrix;
+import io.ecs.common.matrix.impl.*;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleSupplier;
@@ -107,20 +104,20 @@ public interface Matrix {
         return NaiveMatrixOps.colSum(this);
     }
 
-    default Matrix concat(Matrix m, int axis) {
+    default Matrix concatenate(Matrix m, int axis) {
         return (
-            axis == 0 ? concatVertical(m) :
-                axis == 1 ? concatHorizontal(m) :
+            axis == 0 ? concatenateV(m) :
+                axis == 1 ? concatenateH(m) :
                     throwing(new IllegalArgumentException("axis = " + axis))
         );
     }
 
-    default Matrix concatVertical(Matrix m) {
-        return TODO.throwing();
+    default Matrix concatenateV(Matrix m) {
+        return new VerticalConcatenatedMatrix(this, m);
     }
 
-    default Matrix concatHorizontal(Matrix m) {
-        return TODO.throwing();
+    default Matrix concatenateH(Matrix m) {
+        return new HorizontalConcatenatedMatrix(this, m);
     }
 
     default Matrix map(DoubleUnaryOperator f) {

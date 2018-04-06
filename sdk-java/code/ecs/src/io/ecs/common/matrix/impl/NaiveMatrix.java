@@ -13,17 +13,6 @@ public class NaiveMatrix implements Matrix {
     }
 
     @Override
-    public Matrix t() {
-        double[][] np = new double[cols()][rows()];
-        for (int j = 0; j < cols(); j++) {
-            for (int i = 0; i < rows(); i++) {
-                np[j][i] = get(i, j);
-            }
-        }
-        return new NaiveMatrix(np);
-    }
-
-    @Override
     public double get(int row, int col) {
         if (row < 0) row += rows();
         if (col < 0) col += cols();

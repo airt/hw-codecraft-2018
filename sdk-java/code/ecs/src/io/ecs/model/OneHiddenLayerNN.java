@@ -2,20 +2,62 @@ package io.ecs.model;
 
 import io.ecs.common.Matrix;
 
+import java.time.temporal.ValueRange;
 import java.util.HashMap;
 
 /**
  * 只含有一个隐藏层的神经网络.
  */
-public class OneHiddenLayerNN implements Model{
-    @Override
-    public void fit(Matrix xs, Matrix ys) {
+public class OneHiddenLayerNN implements Model {
 
+    private int numIterations;
+    private double learningRate;
+    HashMap<String, Matrix> parameters;
+
+    public OneHiddenLayerNN() {
+    }
+
+    public OneHiddenLayerNN(int numIterations, double learningRate) {
+        this.numIterations = numIterations;
+        this.learningRate = learningRate;
+        this.parameters = new HashMap<>();
     }
 
     @Override
-    public Matrix predict(Matrix xs) {
-        return null;
+    public void fit(Matrix X, Matrix Y) {
+        boolean print_cost = true;
+        int nx = layerSizes(X, Y)[0];
+        int nh = 4;
+        int ny = layerSizes(X, Y)[2];
+
+        parameters = initializeParameters(nx, nh, ny);
+        Matrix W1 = parameters.get("W1");
+        Matrix b1 = parameters.get("b1");
+        Matrix W2 = parameters.get("W2");
+        Matrix b2 = parameters.get("b2");
+
+        for (int i = 0; i < numIterations; i++) {
+            HashMap<String, Matrix> cache = forwardPropagation(X, parameters);
+            double cost = computeCost(cache.get("Z2"), Y);
+            HashMap<String, Matrix> grads = backwardPropagation(parameters, cache, X, Y);
+            updateParameters(parameters, grads, learningRate);
+            if (print_cost && i % 100 == 0) {
+                System.out.printf("Cost after iteration %d: %f", i, cost);
+                System.out.println();
+            }
+        }
+    }
+
+    @Override
+    public Matrix predict(Matrix X) {
+        return forwardPropagation(X, parameters).get("Z2");
+    }
+
+    public int[] layerSizes(Matrix X, Matrix Y) {
+        int nx = X.shape()._1();
+        int nh = 4;
+        int ny = Y.shape()._1();
+        return new int[] {nx, nh, ny};
     }
 
     public HashMap<String, Matrix> initializeParameters(int nx, int nh, int ny) {
@@ -68,12 +110,21 @@ public class OneHiddenLayerNN implements Model{
         Matrix A1 = cache.get("A1");
         Matrix Z2 = cache.get("Z2");
 
-        Matrix dW2 = A1.mul(Z2.sub(Y).t()).dotDiv(m);
-        Matrix db2 = Z2.sub(Y).rowSum().dotDiv(m);
-        Matrix dA1 = W1.t().mul(Z2.sub(Y).t()).dotDiv(m);
+        Matrix dZ2 = Z2.sub(Y).dotDiv(m);
+        HashMap<String, Matrix> cache2 = new HashMap<>();
+        cache2.put("W", W2);
+        cache2.put("A", A1);
+        HashMap<String, Matrix> p2 = NnUtils.linearBackward(dZ2, cache2);
+        Matrix dW2 = p2.get("dW");
+        Matrix db2 = p2.get("db");
+        Matrix dA1 = p2.get("dA");
         Matrix dZ1 = NnUtils.reluBackward(dA1, Z1);
-        Matrix dW1 = dZ1.mul(X.t()).dotDiv(m);
-        Matrix db1 = dZ1.rowSum().dotDiv(m);
+        HashMap<String, Matrix> cache1 = new HashMap<>();
+        cache1.put("W", W1);
+        cache1.put("A", X);
+        HashMap<String, Matrix> p1 = NnUtils.linearBackward(dZ1, cache1);
+        Matrix dW1 = p1.get("dW");
+        Matrix db1 = p1.get("db");
 
         HashMap<String, Matrix> grads = new HashMap<>();
         grads.put("dW1", dW1);
@@ -82,5 +133,29 @@ public class OneHiddenLayerNN implements Model{
         grads.put("db2", db2);
 
         return grads;
+    }
+
+    public HashMap<String, Matrix> updateParameters(HashMap<String, Matrix> parameters, HashMap<String, Matrix> grads, double learningRate) {
+        Matrix W1 = parameters.get("W1");
+        Matrix b1 = parameters.get("b1");
+        Matrix W2 = parameters.get("W2");
+        Matrix b2 = parameters.get("b2");
+
+        Matrix dW1 = grads.get("dW1");
+        Matrix db1 = grads.get("db1");
+        Matrix dW2 = grads.get("dW2");
+        Matrix db2 = grads.get("db2");
+
+        W1 = W1.sub(dW1.mul(learningRate));
+        b1 = b1.sub(db1.mul(learningRate));
+        W2 = W2.sub(dW2.mul(learningRate));
+        b2 = b2.sub(db2.mul(learningRate));
+
+        parameters.put("W1", W1);
+        parameters.put("b1", b1);
+        parameters.put("W2", W2);
+        parameters.put("b2", b2);
+
+        return parameters;
     }
 }

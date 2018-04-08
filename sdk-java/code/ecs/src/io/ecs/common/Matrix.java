@@ -163,9 +163,23 @@ public interface Matrix {
     RowVector row(int row);
 
     /**
+     * m[i:j, :]
+     */
+    default Matrix row(int start, int end) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * m[:, j]
      */
     ColVector col(int col);
+
+    /**
+     * m[:, i:j]
+     */
+    default Matrix col(int start, int end) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * how many rows?

@@ -3,7 +3,6 @@ package io.ecs.common.matrix.impl;
 import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
 import io.ecs.common.RowVector;
-import io.ecs.common.TODO;
 
 public class VerticalConcatenatedMatrix implements Matrix {
 
@@ -18,19 +17,21 @@ public class VerticalConcatenatedMatrix implements Matrix {
 
     @Override
     public double get(int row, int col) {
-        if (row < 0) row += rows();
-        if (col < 0) col += cols();
+        row = fixRow(row);
+        col = fixCol(col);
         return row < m1.rows() ? m1.get(row, col) : m2.get(row - m1.rows(), col);
     }
 
     @Override
     public RowVector row(int row) {
-        return TODO.throwing();
+        row = fixRow(row);
+        return row < m1.rows() ? m1.row(row) : m2.row(row - m1.rows());
     }
 
     @Override
     public ColVector col(int col) {
-        return TODO.throwing();
+        col = fixCol(col);
+        return m1.col(col).concatenateV(m2.col(col)).col(0);
     }
 
     @Override

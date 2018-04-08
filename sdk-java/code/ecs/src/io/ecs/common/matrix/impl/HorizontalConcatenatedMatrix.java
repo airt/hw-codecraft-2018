@@ -3,7 +3,6 @@ package io.ecs.common.matrix.impl;
 import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
 import io.ecs.common.RowVector;
-import io.ecs.common.TODO;
 
 public class HorizontalConcatenatedMatrix implements Matrix {
 
@@ -18,19 +17,21 @@ public class HorizontalConcatenatedMatrix implements Matrix {
 
     @Override
     public double get(int row, int col) {
-        if (row < 0) row += rows();
-        if (col < 0) col += cols();
+        row = fixRow(row);
+        col = fixCol(col);
         return col < m1.cols() ? m1.get(row, col) : m2.get(row, col - m1.cols());
     }
 
     @Override
     public RowVector row(int row) {
-        return TODO.throwing();
+        row = fixRow(row);
+        return m1.row(row).concatenateH(m2.row(row)).row(0);
     }
 
     @Override
     public ColVector col(int col) {
-        return TODO.throwing();
+        col = fixCol(col);
+        return col < m1.cols() ? m1.col(col) : m2.col(col - m1.cols());
     }
 
     @Override

@@ -20,7 +20,7 @@ public class DeployWithDP implements Deploy {
    * @return
    */
   @Override
-  public List<List<Server>> deploy(List<Server> predictFlavors, Server physical, int optimization) {
+  public List<Map<Server, Integer>> deploy(List<Server> predictFlavors, Server physical, int optimization) {
     Map<Server, Integer> VMServers = new HashMap<>();
     for (Server server : predictFlavors)
       VMServers.merge(server, 1, (a, b) -> a + b);

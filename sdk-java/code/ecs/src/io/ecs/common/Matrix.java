@@ -62,7 +62,7 @@ public interface Matrix {
     }
 
     default Matrix dotDiv(Matrix m) {
-        return zip(m, (x, y) -> x / y);
+        return zip(m, (x, y) -> y == 0 ? x == 0 ? 0 : throwing(new ArithmeticException()) : x / y);
     }
 
     /**

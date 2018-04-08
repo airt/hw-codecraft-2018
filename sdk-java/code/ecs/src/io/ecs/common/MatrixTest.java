@@ -141,8 +141,30 @@ class MatrixTest {
 
     @Test
     void get() {
+        assertEquals(1, m.get(0, 0));
+        assertEquals(1, m.get(-2, -3));
         assertEquals(6, m.get(1, 2));
         assertEquals(6, m.get(-1, -1));
+    }
+
+    @Test
+    void getRange1() {
+        Matrix mm = m.get(0, 0, -1, -1);
+        assertEquals(Tuple2.of(2, 3), mm.shape());
+        assertEquals(1, mm.get(0, 0));
+        assertEquals(1, mm.get(-2, -3));
+        assertEquals(6, mm.get(1, 2));
+        assertEquals(6, mm.get(-1, -1));
+    }
+
+    @Test
+    void getRange2() {
+        Matrix mm = m.get(1, 1, -1, -1);
+        assertEquals(Tuple2.of(1, 2), mm.shape());
+        assertEquals(5, mm.get(0, 0));
+        assertEquals(5, mm.get(-1, -2));
+        assertEquals(6, mm.get(0, 1));
+        assertEquals(6, mm.get(-1, -1));
     }
 
     @Test
@@ -155,6 +177,20 @@ class MatrixTest {
     @Test
     void col() {
         Matrix mm = m.col(-1);
+        assertEquals(Tuple2.of(2, 1), mm.shape());
+        assertEquals(6, mm.get(1, 0));
+    }
+
+    @Test
+    void rowsRange() {
+        Matrix mm = m.rows(-1, -1);
+        assertEquals(Tuple2.of(1, 3), mm.shape());
+        assertEquals(6, mm.get(0, 2));
+    }
+
+    @Test
+    void colsRange() {
+        Matrix mm = m.cols(-1, -1);
         assertEquals(Tuple2.of(2, 1), mm.shape());
         assertEquals(6, mm.get(1, 0));
     }

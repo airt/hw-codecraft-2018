@@ -1,7 +1,6 @@
 package io.ecs.common.matrix.impl;
 
 import io.ecs.common.Matrix;
-import io.ecs.common.RowVector;
 import io.ecs.common.function.IntIntDoubleDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntDoubleToDoubleFunction;
 
@@ -185,4 +184,5 @@ public class NaiveMatrixOps {
             return throwing(new IllegalArgumentException("axis = " + axis));
         }
     }
+
 }

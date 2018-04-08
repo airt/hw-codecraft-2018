@@ -150,12 +150,24 @@ public interface Matrix {
         return NaiveMatrixOps.zip(this, m, f);
     }
 
+    default int fixRow(int row) {
+        return row < 0 ? row + rows() : row;
+    }
+
+    default int fixCol(int col) {
+        return col < 0 ? col + cols() : col;
+    }
+
     /**
      * m[i, j]
      * <p>
      * m[-1, -1] == m[nRows - 1, nCols - 1]
      */
     double get(int row, int col);
+
+    default Matrix get(int rowA, int colA, int rowZ, int colZ) {
+        return new RefMatrix(this, fixRow(rowA), fixCol(colA), fixRow(rowZ), fixCol(colZ));
+    }
 
     /**
      * m[i, :]
@@ -165,8 +177,8 @@ public interface Matrix {
     /**
      * m[i:j, :]
      */
-    default Matrix row(int start, int end) {
-        throw new UnsupportedOperationException();
+    default Matrix rows(int rowA, int rowZ) {
+        return get(rowA, 0, rowZ, cols() - 1);
     }
 
     /**
@@ -177,8 +189,8 @@ public interface Matrix {
     /**
      * m[:, i:j]
      */
-    default Matrix col(int start, int end) {
-        throw new UnsupportedOperationException();
+    default Matrix cols(int colA, int colZ) {
+        return get(0, colA, rows() - 1, colZ);
     }
 
     /**

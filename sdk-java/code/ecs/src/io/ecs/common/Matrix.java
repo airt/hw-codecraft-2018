@@ -58,7 +58,7 @@ public interface Matrix {
     }
 
     default Matrix dotDiv(double n) {
-        return map(x -> x / n);
+        return map(x -> n == 0 ? x == 0 ? 0 : throwing(new ArithmeticException()) : x / n);
     }
 
     default Matrix dotDiv(Matrix m) {

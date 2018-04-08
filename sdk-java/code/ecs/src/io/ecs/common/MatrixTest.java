@@ -50,19 +50,6 @@ class MatrixTest {
     }
 
     @Test
-    void mean() {
-        Matrix m1 = m.mean(0);
-        assertEquals(Tuple2.of(1, mc), m1.shape());
-        assertEquals(36, m1.get(0, 0));
-        assertEquals(37, m1.get(0, 1));
-        assertEquals(38, m1.get(0, 2));
-        Matrix m2 = m.mean(1);
-        assertEquals(Tuple2.of(mr, 1), m2.shape());
-        assertEquals(15, m2.get(0, 0));
-        assertEquals(25, m2.get(1, 0));
-    }
-
-    @Test
     void min() {
         Matrix m1 = m.min(0);
         assertEquals(Tuple2.of(1, mc), m1.shape());
@@ -83,12 +70,32 @@ class MatrixTest {
     }
 
     @Test
-    void meanAndStdOfRows() {
-        Matrix mm = m.meanAndStdOfRows();
-        assertEquals(Tuple2.of(2, mc), mm.shape());
-        assertEquals(18.70829, mm.get(1, 0), 0.001);
-        assertEquals(18.70829, mm.get(1, 1), 0.001);
-        assertEquals(18.70829, mm.get(1, 2), 0.001);
+    void mean() {
+        Matrix m1 = m.mean(0);
+        assertEquals(Tuple2.of(1, mc), m1.shape());
+        assertEquals(36, m1.get(0, 0));
+        assertEquals(37, m1.get(0, 1));
+        assertEquals(38, m1.get(0, 2));
+        Matrix m2 = m.mean(1);
+        assertEquals(Tuple2.of(mr, 1), m2.shape());
+        assertEquals(15, m2.get(0, 0));
+        assertEquals(25, m2.get(1, 0));
+        assertEquals(35, m2.get(2, 0));
+    }
+
+    @Test
+    void std() {
+        System.out.println(m.show());
+        Matrix m1 = m.std(0);
+        assertEquals(Tuple2.of(1, mc), m1.shape());
+        assertEquals(18.70829, m1.get(0, 0), 0.001);
+        assertEquals(18.70829, m1.get(0, 1), 0.001);
+        assertEquals(18.70829, m1.get(0, 2), 0.001);
+        Matrix m2 = m.std(1);
+        assertEquals(Tuple2.of(mr, 1), m2.shape());
+        assertEquals(2.73861, m2.get(0, 0), 0.001);
+        assertEquals(2.73861, m2.get(1, 0), 0.001);
+        assertEquals(2.73861, m2.get(2, 0), 0.001);
     }
 
     @Test

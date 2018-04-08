@@ -1,7 +1,6 @@
 package io.ecs.common.matrix.impl;
 
 import io.ecs.common.ColVector;
-import io.ecs.common.Matrix;
 import io.ecs.common.RowVector;
 import io.ecs.common.iterator.ArrayIterator;
 
@@ -17,10 +16,8 @@ public class NaiveRowVector implements RowVector {
 
     @Override
     public double get(int row, int col) {
-        if (row < 0) row += rows();
-        if (col < 0) col += cols();
-        if (row != 0) throw new IndexOutOfBoundsException();
-        return payload[col];
+        if (fixRow(row) != 0) throw new IndexOutOfBoundsException();
+        return payload[fixCol(col)];
     }
 
     @Override
@@ -29,26 +26,14 @@ public class NaiveRowVector implements RowVector {
     }
 
     @Override
-    public Matrix mean(int axis) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Matrix meanAndStdOfRows() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public RowVector row(int row) {
-        if (row < 0) row += rows();
-        if (row != 0) throw new IndexOutOfBoundsException();
+        if (fixRow(row) != 0) throw new IndexOutOfBoundsException();
         return this;
     }
 
     @Override
     public ColVector col(int col) {
-        if (col < 0) col += cols();
-        return ColVector.of(payload[col]);
+        return ColVector.of(payload[fixCol(col)]);
     }
 
     @Override

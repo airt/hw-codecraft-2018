@@ -1,10 +1,10 @@
 package io.ecs.common.matrix.impl;
 
+import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
+import io.ecs.common.RowVector;
 import io.ecs.common.function.IntIntDoubleDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntDoubleToDoubleFunction;
-
-import static io.ecs.common.Shortcuts.throwing;
 
 public class NaiveMatrixOps {
 
@@ -26,11 +26,39 @@ public class NaiveMatrixOps {
     public static Matrix mean(Matrix m, int axis) {
         if (axis == 0) {
             return m.colSum().dotDiv(m.rows());
-        } else if (axis == 1) {
-            return m.rowSum().dotDiv(m.cols());
-        } else {
-            return throwing(new IllegalArgumentException("axis = " + axis));
         }
+        if (axis == 1) {
+            return m.rowSum().dotDiv(m.cols());
+        }
+        throw new IllegalArgumentException("invalid axis " + axis);
+    }
+
+    public static Matrix std(Matrix m, int axis, Matrix means) {
+        if (axis == 0) {
+            if (m.rows() <= 1) throw new IllegalStateException();
+            double[] np = new double[m.cols()];
+            for (int j = 0; j < m.cols(); j++) {
+                double mean = means.get(0, j);
+                double sqrsum = 0;
+                for (int i = 0; i < m.rows(); i++) sqrsum += Math.pow(m.get(i, j) - mean, 2);
+                double std = Math.sqrt(sqrsum / (m.rows() - 1));
+                np[j] = std;
+            }
+            return RowVector.of(np);
+        }
+        if (axis == 1) {
+            if (m.cols() <= 1) throw new IllegalStateException();
+            double[] np = new double[m.rows()];
+            for (int i = 0; i < m.rows(); i++) {
+                double mean = means.get(i, 0);
+                double sqrsum = 0;
+                for (int j = 0; j < m.cols(); j++) sqrsum += Math.pow(m.get(i, j) - mean, 2);
+                double std = Math.sqrt(sqrsum / (m.cols() - 1));
+                np[i] = std;
+            }
+            return ColVector.of(np);
+        }
+        throw new IllegalArgumentException("invalid axis " + axis);
     }
 
     public static Matrix meanAndStdOfRows(Matrix m) {
@@ -62,7 +90,7 @@ public class NaiveMatrixOps {
         return r;
     }
 
-    public static NaiveColVector rowSum(Matrix m) {
+    public static ColVector rowSum(Matrix m) {
         double[] np = new double[m.rows()];
         for (int i = 0; i < m.rows(); i++) {
             double t = 0.0;
@@ -74,7 +102,7 @@ public class NaiveMatrixOps {
         return new NaiveColVector(np);
     }
 
-    public static NaiveRowVector colSum(Matrix m) {
+    public static RowVector colSum(Matrix m) {
         double[] np = new double[m.cols()];
         for (int i = 0; i < m.cols(); i++) {
             double t = 0.0;
@@ -93,7 +121,7 @@ public class NaiveMatrixOps {
                 np[i][j] = f.apply(i, j, m.get(i, j));
             }
         }
-        return new NaiveMatrix(np);
+        return Matrix.of(np);
     }
 
     public static Matrix zip(Matrix m1, Matrix m2, IntIntDoubleDoubleToDoubleFunction f) {
@@ -113,7 +141,7 @@ public class NaiveMatrixOps {
                 );
             }
         }
-        return new NaiveMatrix(np);
+        return Matrix.of(np);
     }
 
     private static boolean canZip(Matrix m1, Matrix m2) {
@@ -144,7 +172,8 @@ public class NaiveMatrixOps {
                 np[i] = min;
             }
             return new NaiveRowVector(np);
-        } else if (axis == 1) {
+        }
+        if (axis == 1) {
             double[] np = new double[matrix.rows()];
             for (int i = 0; i < matrix.rows(); i++) {
                 double min = Double.MAX_VALUE;
@@ -154,9 +183,8 @@ public class NaiveMatrixOps {
                 np[i] = min;
             }
             return new NaiveColVector(np);
-        } else {
-            return throwing(new IllegalArgumentException("axis = " + axis));
         }
+        throw new IllegalArgumentException("invalid axis " + axis);
     }
 
     public static Matrix max(Matrix matrix, int axis) {
@@ -170,7 +198,8 @@ public class NaiveMatrixOps {
                 np[i] = max;
             }
             return new NaiveRowVector(np);
-        } else if (axis == 1) {
+        }
+        if (axis == 1) {
             double[] np = new double[matrix.rows()];
             for (int i = 0; i < matrix.rows(); i++) {
                 double max = Double.MIN_VALUE;
@@ -180,9 +209,8 @@ public class NaiveMatrixOps {
                 np[i] = max;
             }
             return new NaiveColVector(np);
-        } else {
-            return throwing(new IllegalArgumentException("axis = " + axis));
         }
+        throw new IllegalArgumentException("invalid axis " + axis);
     }
 
 }

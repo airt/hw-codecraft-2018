@@ -73,31 +73,38 @@ public interface Matrix {
     }
 
     /**
-     * @return matrix m<sub>r</sub> :: (1 × nCols)
-     */
-    default Matrix mean(int axis) {
-        return NaiveMatrixOps.mean(this, axis);
-    }
-
-    /**
-     * min(axis 0: v 1:h)
+     * @return matrix <p> (1 × nCols) if axis = 0 <p> (nRows × 1) if axis = 1
      */
     default Matrix min(int axis) {
         return NaiveMatrixOps.min(this, axis);
     }
 
     /**
-     * min(axis 0: v 1:h)
+     * @return matrix <p> (1 × nCols) if axis = 0 <p> (nRows × 1) if axis = 1
      */
     default Matrix max(int axis) {
         return NaiveMatrixOps.max(this, axis);
     }
 
     /**
-     * @return matrix m<sub>r</sub> :: (2 × nCols)
+     * @return matrix <p> (1 × nCols) if axis = 0 <p> (nRows × 1) if axis = 1
      */
-    default Matrix meanAndStdOfRows() {
-        return NaiveMatrixOps.meanAndStdOfRows(this);
+    default Matrix mean(int axis) {
+        return NaiveMatrixOps.mean(this, axis);
+    }
+
+    /**
+     * @return matrix <p> (1 × nCols) if axis = 0 <p> (nRows × 1) if axis = 1
+     */
+    default Matrix std(int axis) {
+        return std(axis, mean(axis));
+    }
+
+    /**
+     * @return matrix <p> (1 × nCols) if axis = 0 <p> (nRows × 1) if axis = 1
+     */
+    default Matrix std(int axis, Matrix means) {
+        return NaiveMatrixOps.std(this, axis, means);
     }
 
     default double sum() {
@@ -105,16 +112,16 @@ public interface Matrix {
     }
 
     /**
-     * @return matrix m<sub>r</sub> :: (nRows × 1)
+     * @return matrix <p> (nRows × 1)
      */
-    default Matrix rowSum() {
+    default ColVector rowSum() {
         return NaiveMatrixOps.rowSum(this);
     }
 
     /**
-     * @return matrix m<sub>r</sub> :: (1 × nCols)
+     * @return matrix <p> (1 × nCols)
      */
-    default NaiveRowVector colSum() {
+    default RowVector colSum() {
         return NaiveMatrixOps.colSum(this);
     }
 

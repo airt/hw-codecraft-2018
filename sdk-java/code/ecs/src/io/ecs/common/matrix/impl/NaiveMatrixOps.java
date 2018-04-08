@@ -5,6 +5,8 @@ import io.ecs.common.RowVector;
 import io.ecs.common.function.IntIntDoubleDoubleToDoubleFunction;
 import io.ecs.common.function.IntIntDoubleToDoubleFunction;
 
+import static io.ecs.common.Shortcuts.throwing;
+
 public class NaiveMatrixOps {
 
     public static Matrix mul(Matrix lhs, Matrix rhs) {
@@ -22,15 +24,14 @@ public class NaiveMatrixOps {
         return new NaiveMatrix(np);
     }
 
-    public static Matrix meanOfRows(Matrix m) {
-        double[] means = new double[m.cols()];
-        for (int j = 0; j < m.cols(); j++) {
-            double sum = 0;
-            for (int i = 0; i < m.rows(); i++) sum += m.get(i, j);
-            double mean = sum / m.rows();
-            means[j] = mean;
+    public static Matrix mean(Matrix m, int axis) {
+        if (axis == 0) {
+            return m.colSum().dotDiv(m.rows());
+        } else if (axis == 1) {
+            return m.rowSum().dotDiv(m.cols());
+        } else {
+            return throwing(new IllegalArgumentException("axis = " + axis));
         }
-        return RowVector.of(means);
     }
 
     public static Matrix meanAndStdOfRows(Matrix m) {
@@ -62,28 +63,28 @@ public class NaiveMatrixOps {
         return r;
     }
 
-    public static Matrix rowSum(Matrix m) {
-        double[][] np = new double[m.rows()][1];
+    public static NaiveColVector rowSum(Matrix m) {
+        double[] np = new double[m.rows()];
         for (int i = 0; i < m.rows(); i++) {
             double t = 0.0;
             for (int j = 0; j < m.cols(); j++) {
                 t += m.get(i, j);
             }
-            np[i][0] = t;
+            np[i] = t;
         }
-        return new NaiveMatrix(np);
+        return new NaiveColVector(np);
     }
 
-    public static Matrix colSum(Matrix m) {
-        double[][] np = new double[1][m.cols()];
+    public static NaiveRowVector colSum(Matrix m) {
+        double[] np = new double[m.cols()];
         for (int i = 0; i < m.cols(); i++) {
             double t = 0.0;
             for (int j = 0; j < m.rows(); j++) {
                 t += m.get(j, i);
             }
-            np[0][i] = t;
+            np[i] = t;
         }
-        return new NaiveMatrix(np);
+        return new NaiveRowVector(np);
     }
 
     public static Matrix map(Matrix m, IntIntDoubleToDoubleFunction f) {
@@ -133,4 +134,55 @@ public class NaiveMatrixOps {
         return lines.toString();
     }
 
+    public static Matrix min(Matrix matrix, int axis) {
+        if (axis == 0) {
+            double[] np = new double[matrix.cols()];
+            for (int i = 0; i < matrix.cols(); i++) {
+                double min = Double.MAX_VALUE;
+                for (int j = 0; j < matrix.rows(); j++) {
+                    min = matrix.get(j, i) < min ? matrix.get(j, i) : min;
+                }
+                np[i] = min;
+            }
+            return new NaiveRowVector(np);
+        } else if (axis == 1) {
+            double[] np = new double[matrix.rows()];
+            for (int i = 0; i < matrix.rows(); i++) {
+                double min = Double.MAX_VALUE;
+                for (int j = 0; j < matrix.cols(); j++) {
+                    min = matrix.get(i, j) < min ? matrix.get(i, j) : min;
+                }
+                np[i] = min;
+            }
+            return new NaiveColVector(np);
+        } else {
+            return throwing(new IllegalArgumentException("axis = " + axis));
+        }
+    }
+
+    public static Matrix max(Matrix matrix, int axis) {
+        if (axis == 0) {
+            double[] np = new double[matrix.cols()];
+            for (int i = 0; i < matrix.cols(); i++) {
+                double max = Double.MIN_VALUE;
+                for (int j = 0; j < matrix.rows(); j++) {
+                    max = matrix.get(j, i) > max ? matrix.get(j, i) : max;
+                }
+                np[i] = max;
+            }
+            return new NaiveRowVector(np);
+        } else if (axis == 1) {
+            double[] np = new double[matrix.rows()];
+            for (int i = 0; i < matrix.rows(); i++) {
+                double max = Double.MIN_VALUE;
+                for (int j = 0; j < matrix.cols(); j++) {
+                    max = matrix.get(i, j) > max ? matrix.get(i, j) : max;
+                }
+                np[i] = max;
+            }
+            return new NaiveColVector(np);
+        } else {
+            return throwing(new IllegalArgumentException("axis = " + axis));
+        }
+    }
 }

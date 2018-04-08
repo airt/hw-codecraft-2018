@@ -47,12 +47,36 @@ class MatrixTest {
     }
 
     @Test
-    void meanOfRows() {
-        Matrix mm = m.meanOfRows();
-        assertEquals(Tuple2.of(1, 3), mm.shape());
-        assertEquals(2.5, mm.get(0, 0));
-        assertEquals(3.5, mm.get(0, 1));
-        assertEquals(4.5, mm.get(0, 2));
+    void mean() {
+        Matrix m1 = m.mean(0);
+        assertEquals(Tuple2.of(1, 3), m1.shape());
+        assertEquals(2.5, m1.get(0, 0));
+        assertEquals(3.5, m1.get(0, 1));
+        assertEquals(4.5, m1.get(0, 2));
+        Matrix m2 = m.mean(1);
+        assertEquals(Tuple2.of(2, 1), m2.shape());
+        assertEquals(2.0, m2.get(0, 0));
+        assertEquals(5.0, m2.get(1, 0));
+    }
+
+    @Test
+    void min() {
+        Matrix m1 = m.min(0);
+        assertEquals(Tuple2.of(1, 3), m1.shape());
+        assertEquals(3, m1.get(0, 2));
+        Matrix m2 = m.min(1);
+        assertEquals(Tuple2.of(2, 1), m2.shape());
+        assertEquals(4, m2.get(1, 0));
+    }
+
+    @Test
+    void max() {
+        Matrix m1 = m.max(0);
+        assertEquals(Tuple2.of(1, 3), m1.shape());
+        assertEquals(6, m1.get(0, 2));
+        Matrix m2 = m.max(1);
+        assertEquals(Tuple2.of(2, 1), m2.shape());
+        assertEquals(6, m2.get(1, 0));
     }
 
     @Test

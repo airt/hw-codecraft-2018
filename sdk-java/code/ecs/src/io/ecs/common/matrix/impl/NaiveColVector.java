@@ -29,7 +29,7 @@ public class NaiveColVector implements ColVector {
     }
 
     @Override
-    public Matrix meanOfRows() {
+    public Matrix mean(int axis) {
         double sum = 0;
         for (double v : payload) sum += v;
         double mean = sum / rows();

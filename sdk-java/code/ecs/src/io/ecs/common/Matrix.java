@@ -75,8 +75,22 @@ public interface Matrix {
     /**
      * @return matrix m<sub>r</sub> :: (1 × nCols)
      */
-    default Matrix meanOfRows() {
-        return NaiveMatrixOps.meanOfRows(this);
+    default Matrix mean(int axis) {
+        return NaiveMatrixOps.mean(this, axis);
+    }
+
+    /**
+     * min(axis 0: v 1:h)
+     */
+    default Matrix min(int axis) {
+        return NaiveMatrixOps.min(this, axis);
+    }
+
+    /**
+     * min(axis 0: v 1:h)
+     */
+    default Matrix max(int axis) {
+        return NaiveMatrixOps.max(this, axis);
     }
 
     /**
@@ -100,7 +114,7 @@ public interface Matrix {
     /**
      * @return matrix m<sub>r</sub> :: (1 × nCols)
      */
-    default Matrix colSum() {
+    default NaiveRowVector colSum() {
         return NaiveMatrixOps.colSum(this);
     }
 

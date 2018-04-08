@@ -29,7 +29,7 @@ public class NaiveRowVector implements RowVector {
     }
 
     @Override
-    public Matrix meanOfRows() {
+    public Matrix mean(int axis) {
         throw new UnsupportedOperationException();
     }
 

@@ -179,7 +179,16 @@ public interface Matrix {
     /**
      * m[i, :]
      */
-    RowVector row(int row);
+    default RowVector row(int row) {
+        return NaiveMatrixOps.row(this, row);
+    }
+
+    /**
+     * m[:, j]
+     */
+    default ColVector col(int col) {
+        return NaiveMatrixOps.col(this, col);
+    }
 
     /**
      * m[i:j, :]
@@ -187,11 +196,6 @@ public interface Matrix {
     default Matrix rows(int rowA, int rowZ) {
         return get(rowA, 0, rowZ, cols() - 1);
     }
-
-    /**
-     * m[:, j]
-     */
-    ColVector col(int col);
 
     /**
      * m[:, i:j]

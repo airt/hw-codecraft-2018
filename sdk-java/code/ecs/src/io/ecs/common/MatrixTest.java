@@ -2,8 +2,7 @@ package io.ecs.common;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MatrixTest {
 
@@ -85,7 +84,6 @@ class MatrixTest {
 
     @Test
     void std() {
-        System.out.println(m.show());
         Matrix m1 = m.std(0);
         assertEquals(Tuple2.of(1, mc), m1.shape());
         assertEquals(18.70829, m1.get(0, 0), 0.001);
@@ -96,6 +94,26 @@ class MatrixTest {
         assertEquals(2.73861, m2.get(0, 0), 0.001);
         assertEquals(2.73861, m2.get(1, 0), 0.001);
         assertEquals(2.73861, m2.get(2, 0), 0.001);
+    }
+
+    @Test
+    void concatenateV() {
+        Matrix mm = m.concatenate(m, 0);
+        assertEquals(Tuple2.of(mr * 2, mc), mm.shape());
+        assertEquals(11, mm.get(0, 0));
+        assertEquals(69, mm.get(-1, -1));
+        assertEquals(Tuple2.of(1, mc), mm.row(-1).shape());
+        assertEquals(Tuple2.of(mr * 2, 1), mm.col(-1).shape());
+    }
+
+    @Test
+    void concatenateH() {
+        Matrix mm = m.concatenate(m, 1);
+        assertEquals(Tuple2.of(mr, mc * 2), mm.shape());
+        assertEquals(11, mm.get(0, 0));
+        assertEquals(69, mm.get(-1, -1));
+        assertEquals(Tuple2.of(1, mc * 2), mm.row(-1).shape());
+        assertEquals(Tuple2.of(mr, 1), mm.col(-1).shape());
     }
 
     @Test
@@ -120,6 +138,7 @@ class MatrixTest {
         assertEquals(212121, mm.get(1, 0));
         assertEquals(222222, mm.get(1, 1));
         assertEquals(232323, mm.get(1, 2));
+        assertThrows(IllegalArgumentException.class, () -> m.t().zip(m, (x, y) -> 0));
     }
 
     @Test
@@ -181,6 +200,7 @@ class MatrixTest {
         Matrix mm = m.row(-1);
         assertEquals(Tuple2.of(1, mc), mm.shape());
         assertEquals(62, mm.get(0, 1));
+        assertSame(mm, mm.row(0));
     }
 
     @Test
@@ -188,6 +208,7 @@ class MatrixTest {
         Matrix mm = m.col(-1);
         assertEquals(Tuple2.of(mr, 1), mm.shape());
         assertEquals(29, mm.get(1, 0));
+        assertSame(mm, mm.col(0));
     }
 
     @Test

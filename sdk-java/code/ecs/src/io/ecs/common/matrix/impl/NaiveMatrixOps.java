@@ -61,25 +61,6 @@ public class NaiveMatrixOps {
         throw new IllegalArgumentException("invalid axis " + axis);
     }
 
-    public static Matrix meanAndStdOfRows(Matrix m) {
-        if (m.rows() <= 1) throw new IllegalStateException();
-        double[][] mass = new double[2][m.cols()];
-        for (int j = 0; j < m.cols(); j++) {
-            double sum = 0;
-            for (int i = 0; i < m.rows(); i++) sum += m.get(i, j);
-            double mean = sum / m.rows();
-            mass[0][j] = mean;
-        }
-        for (int j = 0; j < m.cols(); j++) {
-            double mean = mass[0][j];
-            double sqrsum = 0;
-            for (int i = 0; i < m.rows(); i++) sqrsum += Math.pow(m.get(i, j) - mean, 2);
-            double std = Math.sqrt(sqrsum / (m.rows() - 1));
-            mass[1][j] = std;
-        }
-        return new NaiveMatrix(mass);
-    }
-
     public static double sum(Matrix m) {
         double r = 0.0;
         for (int i = 0; i < m.rows(); i++) {
@@ -112,6 +93,20 @@ public class NaiveMatrixOps {
             np[i] = t;
         }
         return new NaiveRowVector(np);
+    }
+
+    public static RowVector row(Matrix m, int row) {
+        row = m.fixRow(row);
+        double[] np = new double[m.cols()];
+        for (int j = 0; j < m.cols(); j++) np[j] = m.get(row, j);
+        return RowVector.of(np);
+    }
+
+    public static ColVector col(Matrix m, int col) {
+        col = m.fixCol(col);
+        double[] np = new double[m.rows()];
+        for (int i = 0; i < m.rows(); i++) np[i] = m.get(i, col);
+        return ColVector.of(np);
     }
 
     public static Matrix map(Matrix m, IntIntDoubleToDoubleFunction f) {

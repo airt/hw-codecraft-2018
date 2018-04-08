@@ -1,6 +1,5 @@
 package io.ecs.common.matrix.impl;
 
-import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
 import io.ecs.common.RowVector;
 
@@ -26,12 +25,6 @@ public class VerticalConcatenatedMatrix implements Matrix {
     public RowVector row(int row) {
         row = fixRow(row);
         return row < m1.rows() ? m1.row(row) : m2.row(row - m1.rows());
-    }
-
-    @Override
-    public ColVector col(int col) {
-        col = fixCol(col);
-        return m1.col(col).concatenateV(m2.col(col)).col(0);
     }
 
     @Override

@@ -2,7 +2,6 @@ package io.ecs.common.matrix.impl;
 
 import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
-import io.ecs.common.RowVector;
 
 public class HorizontalConcatenatedMatrix implements Matrix {
 
@@ -20,12 +19,6 @@ public class HorizontalConcatenatedMatrix implements Matrix {
         row = fixRow(row);
         col = fixCol(col);
         return col < m1.cols() ? m1.get(row, col) : m2.get(row, col - m1.cols());
-    }
-
-    @Override
-    public RowVector row(int row) {
-        row = fixRow(row);
-        return m1.row(row).concatenateH(m2.row(row)).row(0);
     }
 
     @Override

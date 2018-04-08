@@ -1,6 +1,5 @@
 package io.ecs.common.matrix.impl;
 
-import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
 import io.ecs.common.RowVector;
 
@@ -14,23 +13,12 @@ public class NaiveMatrix implements Matrix {
 
     @Override
     public double get(int row, int col) {
-        if (row < 0) row += rows();
-        if (col < 0) col += cols();
-        return payload[row][col];
+        return payload[fixRow(row)][fixCol(col)];
     }
 
     @Override
     public RowVector row(int row) {
-        if (row < 0) row += rows();
-        return RowVector.of(payload[row]);
-    }
-
-    @Override
-    public ColVector col(int col) {
-        if (col < 0) col += cols();
-        double[] np = new double[rows()];
-        for (int i = 0; i < rows(); i++) np[i] = payload[i][col];
-        return ColVector.of(np);
+        return RowVector.of(payload[fixRow(row)]);
     }
 
     @Override

@@ -1,11 +1,9 @@
 package io.ecs.model;
 
 import io.ecs.common.Matrix;
-import io.ecs.common.TODO;
 import io.ecs.common.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,6 +19,9 @@ public class LinearRegression implements Model {
 
     private int num_iterations;
 
+    public LinearRegression() {
+    }
+
     public LinearRegression(double learning_rate, int num_iterations) {
         this.learning_rate = learning_rate;
         this.num_iterations = num_iterations;
@@ -28,9 +29,9 @@ public class LinearRegression implements Model {
 
     @Override
     public void fit(Matrix X, Matrix Y) {
-        if (X.rows() != Y.rows()) {
+        if (X.cols() != Y.cols()) {
             try {
-                throw new Exception("Features rows not equeals labels!");
+                throw new Exception("X not equeals Y!");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -38,7 +39,7 @@ public class LinearRegression implements Model {
 
         Matrix w = Numpy.initialize_w_zeros(X.rows());
         double b = 0.0;
-        Tuple2<Matrix, Double> tuple2 = optimize(w, b, X, Y, num_iterations, learning_rate, false);
+        Tuple2<Matrix, Double> tuple2 = optimize(w, b, X, Y, num_iterations, learning_rate, true);
         this.w = tuple2._1();
         this.b = tuple2._2();
     }
@@ -84,5 +85,10 @@ public class LinearRegression implements Model {
     @Override
     public Matrix predict(Matrix X) {
         return w.t().mul(X).add(b);
+    }
+
+    @Override
+    public double score(Matrix xs, Matrix ys) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -2,7 +2,6 @@ package io.ecs.model;
 
 import io.ecs.common.Matrix;
 
-import java.time.temporal.ValueRange;
 import java.util.HashMap;
 
 /**
@@ -51,6 +50,11 @@ public class OneHiddenLayerNN implements Model {
     @Override
     public Matrix predict(Matrix X) {
         return forwardPropagation(X, parameters).get("Z2");
+    }
+
+    @Override
+    public double score(Matrix xs, Matrix ys) {
+        throw  new UnsupportedOperationException();
     }
 
     public int[] layerSizes(Matrix X, Matrix Y) {
@@ -113,7 +117,7 @@ public class OneHiddenLayerNN implements Model {
         Matrix dZ2 = Z2.sub(Y).dotDiv(m);
         HashMap<String, Matrix> cache2 = new HashMap<>();
         cache2.put("W", W2);
-        cache2.put("A", A1);
+        cache2.put("A_prev", A1);
         HashMap<String, Matrix> p2 = NnUtils.linearBackward(dZ2, cache2);
         Matrix dW2 = p2.get("dW");
         Matrix db2 = p2.get("db");
@@ -121,7 +125,7 @@ public class OneHiddenLayerNN implements Model {
         Matrix dZ1 = NnUtils.reluBackward(dA1, Z1);
         HashMap<String, Matrix> cache1 = new HashMap<>();
         cache1.put("W", W1);
-        cache1.put("A", X);
+        cache1.put("A_prev", X);
         HashMap<String, Matrix> p1 = NnUtils.linearBackward(dZ1, cache1);
         Matrix dW1 = p1.get("dW");
         Matrix db1 = p1.get("db");

@@ -13,8 +13,8 @@ public class GradientBoosting implements Model {
 
     public GradientBoosting(int n, IntFunction<Model> creator) {
         bases = IntStream.range(0, n).
-            mapToObj(creator).
-            collect(Collectors.toList());
+                mapToObj(creator).
+                collect(Collectors.toList());
     }
 
     @Override
@@ -29,9 +29,14 @@ public class GradientBoosting implements Model {
     @Override
     public Matrix predict(Matrix xs) {
         return bases.stream().
-            map(model -> model.predict(xs)).
-            reduce(Matrix::add).
-            orElseThrow(IllegalStateException::new);
+                map(model -> model.predict(xs)).
+                reduce(Matrix::add).
+                orElseThrow(IllegalStateException::new);
+    }
+
+    @Override
+    public double score(Matrix xs, Matrix ys) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

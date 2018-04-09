@@ -4,24 +4,31 @@ import io.ecs.common.Matrix;
 
 public interface Model {
 
-    /**
-     * m: number of training examples
-     * <p>
-     * n: number of features
-     *
-     * @param xs :: (m × n)
-     * @param ys :: (m × 1)
-     */
-    void fit(Matrix xs, Matrix ys);
+  /**
+   * n: number of training examples
+   * <p>
+   * m: number of features
+   *
+   * @param xs :: (n × m)
+   * @param ys :: (1 × m)
+   */
+  void fit(Matrix xs, Matrix ys);
 
-    /**
-     * @param xs :: (m × n)
-     * @return ys :: (m × 1)
-     */
-    Matrix predict(Matrix xs);
+  /**
+   * @param xs :: (m × n)
+   * @return ys :: (m × 1)
+   */
+  Matrix predict(Matrix xs);
 
-    default String inspect() {
-        throw new UnsupportedOperationException();
-    }
+  /**
+   * RMSE
+   * @param xs :: (n x m)
+   * @param ys :: (1 x m)
+   */
+  double score(Matrix xs, Matrix ys);
+
+  default String inspect() {
+    throw new UnsupportedOperationException();
+  }
 
 }

@@ -1,12 +1,15 @@
 package io.ecs.model;
 
+import io.ecs.common.ColVector;
 import io.ecs.common.Matrix;
+import io.ecs.common.RowVector;
+
 import java.util.HashMap;
 
 /**
  * 多层神经网络
  */
-class NN implements Model {
+public class NN implements Model {
 
     private int numIterations;
     private double learningRate;
@@ -25,9 +28,16 @@ class NN implements Model {
 
     @Override
     public void fit(Matrix X, Matrix Y) {
-        boolean print_cost = true;
+        boolean print_cost = false;
 
-        parameters = initialParametersDeep(layerDims);
+        int n = X.shape()._1();
+        int[] layers = new int[layerDims.length + 1];
+        layers[0] = n;
+        for (int i = 1; i < layers.length; i++) {
+            layers[i] = layerDims[i-1];
+        }
+
+        parameters = initialParametersDeep(layers);
         int l = parameters.size() / 2;
 
         for (int i = 0; i < numIterations; i++) {
@@ -45,7 +55,13 @@ class NN implements Model {
 
     @Override
     public Matrix predict(Matrix X) {
-        return deepModelForward(X, parameters)[layerDims.length- 2].get("A");
+        return deepModelForward(X, parameters)[layerDims.length - 1].get("A");
+    }
+
+    @Override
+    public double score(Matrix X, Matrix Y) {
+        Matrix y_hat = predict(X);
+        return Numpy.square(y_hat.sub(Y)).sum() / Y.cols();
     }
 
     public HashMap<String, Matrix> initialParametersDeep(int[] layerDims) {

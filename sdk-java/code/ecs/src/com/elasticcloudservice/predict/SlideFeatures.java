@@ -8,6 +8,7 @@ import io.ecs.common.Tuple2;
 import io.ecs.common.matrix.impl.NaiveColVector;
 import io.ecs.common.matrix.impl.NaiveRowVector;
 import io.ecs.generator.DataGenerator;
+import io.ecs.preprocessing.StandardScaler;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -64,21 +65,26 @@ public class SlideFeatures implements DataGenerator{
 
         int m = totalCpuFea.rows();
         int end = m - T - 1;
-//        Matrix total = totalCpuFea.concatenateH(totalMemFea).concatenateH(flavorFea).concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
-        Matrix total = flavorFea.concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
+        Matrix total = totalCpuFea.concatenateH(totalMemFea).concatenateH(flavorFea).concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
+//        Matrix total = flavorFea.concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
 
         total = total.concatenate(flavorFea.mean(1), 1);
         total = total.concatenate(flavorFea.min(1), 1);
         total = total.concatenate(flavorFea.max(1), 1);
 
-        Matrix X = total.rows(0, end);
+        total = total.t();
+        StandardScaler scaler = new StandardScaler();
+        scaler.fit(total);
+        total = scaler.transform(total);
+
+        Matrix X = total.cols(0, end);
         System.out.println(X.t().show());
 
         RowVector Y = generateY(flavorSlide, look_back, T);
 
         System.out.println(Y.show());
-        Matrix predictX = total.row(-1);
-        return Tuple2.of(Tuple2.of(X.t(), predictX.t()), Y);
+        Matrix predictX = total.col(-1);
+        return Tuple2.of(Tuple2.of(X, predictX), Y);
     }
 
     public RowVector generateY(RowVector orig, int look_back, int t) {

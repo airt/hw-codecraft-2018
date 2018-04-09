@@ -4,8 +4,8 @@ import com.filetool.util.Utils;
 import io.ecs.common.Matrix;
 import io.ecs.common.Tuple2;
 import io.ecs.deploy.DeployBFD;
-import io.ecs.model.LinearRegression;
-import io.ecs.model.Model;
+import io.ecs.model.*;
+import io.ecs.preprocessing.StandardScaler;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -21,7 +21,11 @@ public class Predict {
 
         Map<String, Tuple2<Tuple2<Matrix, Matrix>, Matrix>> data  = createTrainData(history, input.getFlavors(), input.getStartTime(), input.getEndTime());
 
-        Model model = new LinearRegression(0.001, 10000);
+//        Model model = new GradientBoosting(
+//                5,
+//                i -> new LinearRegression(0.01 * Math.pow(0.1, i), 2000)
+//        );
+        Model model = new NN(20000, 0.01, new int[] {4, 2, 1});
 
         HashMap<Server, Integer> predictRe = predict(model, data);
 
@@ -71,7 +75,6 @@ public class Predict {
 
     public static HashMap<Server, Integer> predict(Model model, Map<String, Tuple2<Tuple2<Matrix, Matrix>, Matrix>> data) {
         HashMap<Server, Integer> re = new HashMap<>();
-//        LinearRegression model = new LinearRegression(0.001, 100000);
         for (String flavor : data.keySet()) {
             Matrix X = data.get(flavor)._1()._1();
             Matrix predictX = data.get(flavor)._1()._2();

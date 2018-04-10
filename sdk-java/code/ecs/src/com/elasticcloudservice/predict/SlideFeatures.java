@@ -50,9 +50,9 @@ public class SlideFeatures implements DataGenerator{
         NaiveRowVector totalCpuSlide = generateSlidesByTimes(cpuOfDays, T);
         NaiveRowVector totalMemSlide = generateSlidesByTimes(memOfDays, T);
 
-        NaiveRowVector flavorCpuSlide = generateSlidesByTimes(cpus.row(flavorNum), T);
-        NaiveRowVector flavorMemSlide = generateSlidesByTimes(mems.row(flavorNum), T);
-        NaiveRowVector flavorSlide = generateSlidesByTimes(nums.row(flavorNum), T);
+        NaiveRowVector flavorCpuSlide = generateSlidesByTimes(cpus.row(flavorNum - 1), T);
+        NaiveRowVector flavorMemSlide = generateSlidesByTimes(mems.row(flavorNum - 1), T);
+        NaiveRowVector flavorSlide = generateSlidesByTimes(nums.row(flavorNum - 1), T);
 
         Matrix totalCpuFea = generateFeatures(totalCpuSlide, look_back);
         Matrix totalMemFea = generateFeatures(totalMemSlide, look_back);
@@ -65,24 +65,25 @@ public class SlideFeatures implements DataGenerator{
 
         int m = totalCpuFea.rows();
         int end = m - T - 1;
-        Matrix total = totalCpuFea.concatenateH(totalMemFea).concatenateH(flavorFea).concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
+//        Matrix total = totalCpuFea.concatenateH(totalMemFea).concatenateH(flavorFea).concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
 //        Matrix total = flavorFea.concatenateH(flavorCpuRate).concatenateH(flavorMemRate);
+        Matrix total = flavorFea;
 
         total = total.concatenate(flavorFea.mean(1), 1);
-        total = total.concatenate(flavorFea.min(1), 1);
-        total = total.concatenate(flavorFea.max(1), 1);
+//        total = total.concatenate(flavorFea.min(1), 1);
+//        total = total.concatenate(flavorFea.max(1), 1);
 
         total = total.t();
-        StandardScaler scaler = new StandardScaler();
-        scaler.fit(total);
-        total = scaler.transform(total);
+//        StandardScaler scaler = new StandardScaler();
+//        scaler.fit(total);
+//        total = scaler.transform(total);
 
         Matrix X = total.cols(0, end);
-        System.out.println(X.t().show());
+//        System.out.println(X.t().show());
 
         RowVector Y = generateY(flavorSlide, look_back, T);
 
-        System.out.println(Y.show());
+//        System.out.println(Y.show());
         Matrix predictX = total.col(-1);
         return Tuple2.of(Tuple2.of(X, predictX), Y);
     }

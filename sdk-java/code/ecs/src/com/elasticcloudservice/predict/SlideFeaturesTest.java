@@ -24,6 +24,44 @@ public class SlideFeaturesTest {
     }
 
     @Test
+    void generateData() {
+        Matrix nums = Matrix.of(new double[][]{
+                {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
+                {1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3}
+        });
+        Matrix cpus = Matrix.of(new double[][] {
+                {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
+                {1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+                {2, 4, 6, 2, 4, 6, 2, 4, 6, 2, 4, 6, 2, 4, 6, 2, 4, 6, 2, 4, 6}
+        });
+        Matrix mems = Matrix.of(new double[][] {
+                {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
+                {2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+                {4, 8, 12, 4, 8, 12, 4, 8, 12, 4, 8, 12, 4, 8, 12, 4, 8, 12, 4, 8, 12}
+        });
+        SlideFeatures sf = new SlideFeatures();
+        String flavorName = "flavor5";
+        int T = 7;
+        int lookBack = 5;
+        Tuple2<Tuple2<Matrix, Matrix>, Matrix> data = sf.generateData(nums, cpus, mems, flavorName, T, lookBack);
+        Matrix X = data._1()._1();
+        Matrix predictX = data._1()._2();
+        Matrix Y = data._2();
+        assertEquals(Tuple2.of(6, 4), X.shape());
+        assertEquals(Tuple2.of(1, 4), Y.shape());
+        assertEquals(15.0, Y.get(0, 3));
+        System.out.println(X.show());
+        System.out.println(Y.show());
+    }
+
+    @Test
     void generateSlidesByTimes() {
         SlideFeatures sf = new SlideFeatures();
         NaiveRowVector r = sf.generateSlidesByTimes(rowVector, 7);

@@ -1,69 +1,41 @@
 package com.elasticcloudservice.predict;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 物理服务器即虚拟机，可考虑分开
+ * server class
  */
 public class Server {
-  public String name;
-  public int cpu;
-  public int mem;
+    public int totalMem;
+    public int totalCpu;
+    public int freeMem;
+    public int freeCpu;
+    public List<Flavor> flavors;    // 物理服务器已放置虚拟机列表
 
-  public Server(String name, int cpu, int mem) {
-    this.name = name;
-    this.cpu = cpu;
-    this.mem = mem;
-  }
+    public Server(int totalCpu, int totalMem) {
+        this.totalMem = totalMem;
+        this.totalCpu = totalCpu;
+        this.freeCpu = totalCpu;
+        this.freeMem = totalMem;
+        this.flavors = new ArrayList<>();
+    }
 
-  public String getName() {
-    return name;
-  }
+    public boolean putFlavor(Flavor flavor) {
+        if (freeCpu >= flavor.cpu && freeMem >= flavor.mem) {
+            freeCpu -= flavor.cpu;
+            freeMem -= flavor.mem;
+            flavors.add(flavor);
+            return true;
+        }
+        return false;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public double getCpuUsageRate() {
+        return 1 - freeCpu / (double)totalCpu;
+    }
 
-  public int getCpu() {
-    return cpu;
-  }
-
-  public void setCpu(int cpu) {
-    this.cpu = cpu;
-  }
-
-  public int getMem() {
-    return mem;
-  }
-
-  public void setMem(int mem) {
-    this.mem = mem;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Server server = (Server) o;
-
-    if (cpu != server.cpu) return false;
-    if (mem != server.mem) return false;
-    return name != null ? name.equals(server.name) : server.name == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = name != null ? name.hashCode() : 0;
-    result = 31 * result + cpu;
-    result = 31 * result + mem;
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "Server{" +
-      "name='" + name + '\'' +
-      ", cpu=" + cpu +
-      ", mem=" + mem +
-      '}';
-  }
+    public double getMemUsageRate() {
+        return 1 - freeMem / (double) totalMem;
+    }
 }

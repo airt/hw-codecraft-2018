@@ -1,5 +1,6 @@
 package com.model;
 
+import com.elasticcloudservice.predict.Flavor;
 import com.elasticcloudservice.predict.Server;
 
 import java.util.Map;
@@ -16,13 +17,13 @@ public class Metrics {
      * @param predictFlavors    需要预测规格虚拟机的预测数量
      * @return
      */
-    public static double hill(Map<Server, Integer> flavorsNum, Map<Server, Integer> predictFlavors) {
+    public static double hill(Map<Flavor, Integer> flavorsNum, Map<Flavor, Integer> predictFlavors) {
         // 虚拟机规格的集合
         double n = flavorsNum.size();
         double sum = 0.0;
         double actualSum = 0.0;
         double predictSum = 0.0;
-        for (Server flavor : flavorsNum.keySet()) {
+        for (Flavor flavor : flavorsNum.keySet()) {
             sum += Math.pow(flavorsNum.get(flavor) - predictFlavors.get(flavor), 2);
             actualSum += Math.pow(flavorsNum.get(flavor), 2);
             predictSum += Math.pow(predictFlavors.get(flavor), 2);
@@ -41,23 +42,22 @@ public class Metrics {
      * @param predictFlavors
      * @return
      */
-    public static double predictScore(Map<Server, Integer> flavorsNum, Map<Server, Integer> predictFlavors) {
+    public static double predictScore(Map<Flavor, Integer> flavorsNum, Map<Flavor, Integer> predictFlavors) {
         return 1 - hill(flavorsNum, predictFlavors);
     }
 
     /**
      * 虚拟机预测后，虚拟机分配得分计算
      * @param predictFlavors
-     * @param physical
      * @param physicalNum   物理服务器数目
      * @param optimization 需要优化的资源（0：cpu, 1: Mem）
      * @return
      */
-    public static double deployScore(Map<Server, Integer> predictFlavors, Server physical, int physicalNum, int optimization) {
-        double denominator = optimization == 0 ? physical.getCpu() * physicalNum : physical.getMem() * physicalNum;
+    public static double deployScore(Map<Flavor, Integer> predictFlavors, Server server, int physicalNum, int optimization) {
+        double denominator = optimization == 0 ? server.totalCpu * physicalNum : server.totalMem * physicalNum;
         double numerator = 0.0;
-        for (Server flavor : predictFlavors.keySet()) {
-            numerator += (optimization == 0 ? flavor.getCpu() : flavor.getMem()) * predictFlavors.get(flavor);
+        for (Flavor flavor : predictFlavors.keySet()) {
+            numerator += (optimization == 0 ? flavor.cpu : flavor.mem) * predictFlavors.get(flavor);
         }
         return numerator / denominator;
     }
@@ -71,7 +71,7 @@ public class Metrics {
      * @param optimization
      * @return
      */
-    public static double score(Map<Server, Integer> flavorsNum, Map<Server, Integer> predictFlavors, Server physical, int physicalNum, int optimization) {
+    public static double score(Map<Flavor, Integer> flavorsNum, Map<Flavor, Integer> predictFlavors, Server physical, int physicalNum, int optimization) {
         return predictScore(flavorsNum, predictFlavors) * deployScore(predictFlavors, physical, physicalNum, optimization);
     }
 }
